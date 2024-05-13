@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/custom_widgets/eds_listtile.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,27 +35,19 @@ class HomeScreen extends StatelessWidget {
               itemCount: snapshot.data?.docs.length ?? 0,
               itemBuilder: (context, index) {
                 var org = snapshot.data?.docs[index];
-                return ListTile(
-                  leading: FutureBuilder<String>(
-                    future: Provider.of<OrgsProvider>(context, listen: false)
-                        .getImageUrl(org?['orgLogo']),
-                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else {
-                        if (snapshot.hasError) {
-                          print('Error getting image URL: ${snapshot.error}');
-                          return const Icon(Icons.error);
-                        } else {
-                          return CircleAvatar(
-                            backgroundImage: NetworkImage(snapshot.data!),
-                          );
-                        }
-                      }
-                    },
+                return InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/donate',
+                      arguments: org?.id,
+                    );
+                  },
+                  child: EDSListTile(
+                    logoUrl: org?['orgLogo'],
+                    title: org?['orgName'],
+                    subtitle: org?['orgMotto'],
                   ),
-                  title: Text(org?['orgName']),
-                  subtitle: Text(org?['orgMotto']),
                 );
               },
             );

@@ -1,4 +1,5 @@
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
+import 'package:elbi_donation_system/screens/donatepage_screen.dart';
 import 'package:elbi_donation_system/screens/homepage_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,6 +34,8 @@ class MainApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(),
+        '/donate': (context) =>
+            DonatePage(orgId: ModalRoute.of(context)!.settings.arguments as String),
       },
     );
   }

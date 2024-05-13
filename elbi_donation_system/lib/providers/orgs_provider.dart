@@ -18,6 +18,10 @@ class OrgsProvider extends ChangeNotifier {
     // notifyListeners();
   }
 
+  Future<String> getOrganizationId(String orgName) async {
+    return await firebaseService.getOrganizationId(orgName);
+  }
+
   Future<String> getImageUrl(String imagePath) {
     var imgurl = firebaseService.getImageUrl(imagePath);
     return imgurl;
