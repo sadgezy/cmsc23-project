@@ -1,4 +1,5 @@
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
+import 'package:elbi_donation_system/screens/homepage_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -29,11 +30,10 @@ class MainApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+      },
     );
   }
 }

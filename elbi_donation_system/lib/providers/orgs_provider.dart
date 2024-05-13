@@ -11,9 +11,15 @@ class OrgsProvider extends ChangeNotifier {
   }
 
   Stream<QuerySnapshot> get orgs => _orgsStream;
+  Stream<QuerySnapshot> get orgsStream => firebaseService.getOrganizations();
 
   void fetchOrgs() async {
     _orgsStream = firebaseService.getOrganizations();
     // notifyListeners();
+  }
+
+  Future<String> getImageUrl(String imagePath) {
+    var imgurl = firebaseService.getImageUrl(imagePath);
+    return imgurl;
   }
 }
