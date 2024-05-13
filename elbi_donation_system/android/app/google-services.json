@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "91010568696",
+    "project_id": "elbi-donation-system-37957",
+    "storage_bucket": "elbi-donation-system-37957.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91010568696:android:c0a8e55b441c54429b060d",
+        "android_client_info": {
+          "package_name": "com.example.elbi_donation_system"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU4rWt4AjuVhyR0sJ5da0Bx92P1p-BmQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
