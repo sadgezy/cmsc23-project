@@ -21,6 +21,7 @@ class FirebaseOrgsAPI {
   }
 
   Future<String> getImageUrl(String imagePath) async {
+    print("API: $imagePath");
     return await storage.ref(imagePath).getDownloadURL();
   }
 }

@@ -23,7 +23,9 @@ class OrgsProvider extends ChangeNotifier {
   }
 
   Future<String> getImageUrl(String imagePath) {
+    print("Provider: $imagePath");
     var imgurl = firebaseService.getImageUrl(imagePath);
+
     return imgurl;
   }
 }

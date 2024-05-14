@@ -35,19 +35,31 @@ class HomeScreen extends StatelessWidget {
               itemCount: snapshot.data?.docs.length ?? 0,
               itemBuilder: (context, index) {
                 var org = snapshot.data?.docs[index];
-                return InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/donate',
-                      arguments: org?.id,
-                    );
+                return FutureBuilder<String>(
+                  future: Provider.of<OrgsProvider>(context, listen: false)
+                      .getImageUrl(org?['orgLogo']),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return const Center(child: Text('Error loading image'));
+                    } else {
+                      return InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/donate',
+                            arguments: org?.id,
+                          );
+                        },
+                        child: EDSListTile(
+                          logoUrl: snapshot.data!,
+                          title: org?['orgName'],
+                          subtitle: org?['orgMotto'],
+                        ),
+                      );
+                    }
                   },
-                  child: EDSListTile(
-                    logoUrl: org?['orgLogo'],
-                    title: org?['orgName'],
-                    subtitle: org?['orgMotto'],
-                  ),
                 );
               },
             );
