@@ -1,3 +1,4 @@
+import 'package:elbi_donation_system/providers/donatepage_provider.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
 import 'package:elbi_donation_system/screens/donatepage_screen.dart';
 import 'package:elbi_donation_system/screens/homepage_screen.dart';
@@ -11,8 +12,15 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(ChangeNotifierProvider(
-    create: (context) => OrgsProvider(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => OrgsProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => ImageSelect(),
+      ),
+    ],
     child: const MainApp(),
   ));
 }
