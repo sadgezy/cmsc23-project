@@ -1,5 +1,3 @@
-// textstyles.dart
-
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
@@ -13,5 +11,11 @@ class AppTextStyles {
     fontSize: 16.0,
     fontWeight: FontWeight.normal,
     color: Colors.grey,
+  );
+
+  static const cardHeader = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.normal,
+    color: Colors.white,
   );
 }
