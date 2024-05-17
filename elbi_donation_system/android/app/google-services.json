@@ -12,7 +12,12 @@
           "package_name": "com.example.elbi_donation_system"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "91010568696-8e9hmf4cm06po5gulaqgbm0lr079p59k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDU4rWt4AjuVhyR0sJ5da0Bx92P1p-BmQU"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "91010568696-8e9hmf4cm06po5gulaqgbm0lr079p59k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "91010568696-99v4mek3hb5p1ihf0mp049j4m5ukgc00.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.elbiDonationSystem"
+              }
+            }
+          ]
         }
       }
     }
