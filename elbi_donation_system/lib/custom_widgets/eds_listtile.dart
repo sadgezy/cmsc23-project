@@ -2,6 +2,7 @@
 
 import 'package:elbi_donation_system/textstyles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class EDSListTile extends StatelessWidget {
   final String logoUrl;
@@ -17,15 +18,22 @@ class EDSListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Logo URL: $logoUrl");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: SizedBox(
-        height: 100,
+        height: 125,
         child: Card(
           child: ListTile(
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                logoUrl,
+              child: ClipOval(
+                child: SvgPicture.network(
+                  logoUrl,
+                  placeholderBuilder: (BuildContext context) => Container(
+                    padding: const EdgeInsets.all(30.0),
+                    child: const CircularProgressIndicator(),
+                  ),
+                ),
               ),
             ),
             title: Text(

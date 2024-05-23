@@ -18,6 +18,18 @@ class UserAuthProvider with ChangeNotifier {
     _userStream = authService.fetchUser();
   }
 
+  String getUserInitials() {
+    final displayName = FirebaseAuth.instance.currentUser?.displayName ?? '';
+    final initials = displayName.isNotEmpty
+        ? displayName.trim().split(' ').map((l) => l[0]).take(2).join()
+        : '';
+    return initials;
+  }
+
+  String getUserDisplayName() {
+    return FirebaseAuth.instance.currentUser?.displayName ?? '';
+  }
+
   Future<void> signOut() async {
     await authService.signOut();
     notifyListeners();
@@ -25,15 +37,15 @@ class UserAuthProvider with ChangeNotifier {
 
   Future<void> signUp(
     String name,
-    String user_name,
+    String userName,
     String email,
     String password,
-    String contact_no,
+    String contactNo,
     Map<String, String> addresses,
-    bool is_org,
+    bool isOrg,
   ) async {
     await authService.signUp(
-        name, user_name, email, password, contact_no, addresses, is_org);
+        name, userName, email, password, contactNo, addresses, isOrg);
     notifyListeners();
   }
 

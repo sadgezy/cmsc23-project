@@ -18,40 +18,37 @@ class FirebaseAuthAPI {
     return auth.currentUser;
   }
 
-  Future<String?> signUp(
-      String name,
-      String user_name,
-      String email,
-      String password,
-      String contact_no,
-      Map<String, String> addresses,
-      bool is_org) async {
+  Future<String?> signUp(String name, String userName, String email, String password,
+      String contactNo, Map<String, String> addresses, bool isOrg) async {
     try {
-      final UserCredential userCredential =
-          await auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      final User? user = userCredential.user;
 
+      if (user != null) {
+        await user.updateDisplayName(name);
+      }
       await database.runTransaction(
         (Transaction transaction) async {
-          DocumentReference donor_viewRef =
+          DocumentReference donorViewref =
               database.collection("donor_view").doc(userCredential.user!.uid);
 
           // check is user exists
-          DocumentSnapshot snapshot = await transaction.get(donor_viewRef);
+          DocumentSnapshot snapshot = await transaction.get(donorViewref);
           if (!snapshot.exists) {
             // Add user info to Firestore
             // print("here");
             transaction.set(
-              donor_viewRef,
+              donorViewref,
               {
                 'name': name,
-                'user_name': user_name,
+                'user_name': userName,
                 'email': email,
-                'contact_no': contact_no,
+                'contact_no': contactNo,
                 'addresses': addresses,
-                'is_org': is_org,
+                'is_org': isOrg,
                 'id': userCredential.user!.uid,
               },
             );
@@ -80,20 +77,19 @@ class FirebaseAuthAPI {
 
   Future<String?> signIn(String email, String password) async {
     try {
-      UserCredential credentials = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential credentials =
+          await auth.signInWithEmailAndPassword(email: email, password: password);
       print(credentials);
-      print("DSGAFGSDFGSDFGSDFGSDFGDSFGTQERJDFHLSKAJFHASKJDFH");
       return "Success";
     } on FirebaseException catch (e) {
-      return ('${e.code}');
+      return (e.code);
       // if (e.code == 'user-not-found') {
       //   return ('No user found for that email.');
       // } else if (e.code == 'wrong-password') {
       //   return ('Wrong password provided for that user.');
       // }
     } catch (e) {
-      return ('Firebase Error: ${e}');
+      return ('Firebase Error: $e');
     }
   }
 

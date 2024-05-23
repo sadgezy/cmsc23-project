@@ -9,39 +9,57 @@ import '../providers/auth_provider.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  // Drawer getDrawer(BuildContext context) {
-  //   return Drawer(
-  //     child: ListView(
-  //       padding: EdgeInsets.zero,
-  //       children: [
-  //         const DrawerHeader(child: Text("Test_Donation")),
-  //         ListTile(
-  //           title: const Text('Donations'),
-  //           onTap: () {
-  //             Navigator.pop(context);
-  //             Navigator.pushNamed(context, "/");
-  //           },
-  //         ),
-  //         ListTile(
-  //           title: const Text('Logout'),
-  //           onTap: () {
-  //             context.read<UserAuthProvider>().signOut();
-  //             Navigator.pop(context);
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  Drawer getDrawer(BuildContext context) {
+    final displayName =
+        Provider.of<UserAuthProvider>(context, listen: false).getUserDisplayName();
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(child: Text('Hello, $displayName')),
+          ListTile(
+            title: const Text('Donations'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, "/");
+            },
+          ),
+          ListTile(
+            title: const Text('Logout'),
+            onTap: () {
+              context.read<UserAuthProvider>().signOut();
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // drawer: getDrawer(context),
+      drawer: getDrawer(context),
       appBar: AppBar(
-        leading: const Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 8, 8),
-          child: CircleAvatar(),
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+          child: Builder(
+            builder: (context) => InkWell(
+              onTap: () => Scaffold.of(context).openDrawer(),
+              child: Builder(
+                builder: (context) {
+                  final initials = Provider.of<UserAuthProvider>(context, listen: false)
+                      .getUserInitials();
+                  return InkWell(
+                    onTap: () => Scaffold.of(context).openDrawer(),
+                    child: CircleAvatar(
+                      child: Text(initials),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
         ),
         title: const Text("Organizations"),
         actions: const [
@@ -67,17 +85,13 @@ class HomeScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       var org = snapshot.data?.docs[index];
                       return FutureBuilder<String>(
-                        future:
-                            Provider.of<OrgsProvider>(context, listen: false)
-                                .getImageUrl(org?['orgLogo']),
+                        future: Provider.of<OrgsProvider>(context, listen: false)
+                            .getImageUrl(org?['orgLogo']),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
                           } else if (snapshot.hasError) {
-                            return const Center(
-                                child: Text('Error loading image'));
+                            return const Center(child: Text('Error loading image'));
                           } else {
                             return InkWell(
                               onTap: () {
@@ -98,13 +112,6 @@ class HomeScreen extends StatelessWidget {
                       );
                     },
                   ),
-                ),
-                ListTile(
-                  title: const Text('Logout'),
-                  onTap: () {
-                    context.read<UserAuthProvider>().signOut();
-                    // Navigator.pop(context);
-                  },
                 ),
               ],
             );
