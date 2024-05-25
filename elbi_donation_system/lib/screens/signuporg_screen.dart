@@ -55,7 +55,7 @@ class _SignUpOrgScreenState extends State<SignUpOrgScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Organization Application"),
+        title: Text(""),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
