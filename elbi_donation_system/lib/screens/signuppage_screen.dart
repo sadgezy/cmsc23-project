@@ -394,6 +394,7 @@ class _SignUpState extends State<SignUpPage> {
             // check if the widget hasn't been disposed of after an asynchronous action
             if (!showErrorMsg) {
               if (is_org) {
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(

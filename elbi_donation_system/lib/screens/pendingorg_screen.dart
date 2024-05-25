@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'homepage_screen.dart'; 
 
 class PendingOrgScreen extends StatelessWidget {
   @override
@@ -19,11 +18,7 @@ class PendingOrgScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
+              Navigator.pop(context);
               },
               child: Text("Go to Home"),
             ),
