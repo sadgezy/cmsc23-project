@@ -120,6 +120,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'signuporg_screen.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -201,6 +202,7 @@ class _SignUpState extends State<SignUpPage> {
           },
         ),
       );
+
   Widget get name => Padding(
         padding: const EdgeInsets.only(bottom: 30),
         child: TextFormField(
@@ -217,6 +219,7 @@ class _SignUpState extends State<SignUpPage> {
           },
         ),
       );
+
   Widget get username => Padding(
         padding: const EdgeInsets.only(bottom: 30),
         child: TextFormField(
@@ -245,7 +248,7 @@ class _SignUpState extends State<SignUpPage> {
           onSaved: (value) => setState(() => password = value),
           validator: (value) {
             if (value == null || value.isEmpty || value.length < 6) {
-              return "Password must be atleast 6 characters long.";
+              return "Password must be at least 6 characters long.";
             }
             return null;
           },
@@ -322,7 +325,7 @@ class _SignUpState extends State<SignUpPage> {
         return const Padding(
           padding: EdgeInsets.only(bottom: 30),
           child: Text(
-            "Password must be atleast 6 characters",
+            "Password must be at least 6 characters",
             style: TextStyle(color: Colors.red),
           ),
         );
@@ -368,7 +371,7 @@ class _SignUpState extends State<SignUpPage> {
                 .read<UserAuthProvider>()
                 .authService
                 .signUp(fname!, lname!, email!, password!, contact_no!,
-                    addresses, is_org!);
+                    addresses, is_org);
 
             print(showErrorMsg);
             print(errorMsg);
@@ -390,7 +393,16 @@ class _SignUpState extends State<SignUpPage> {
 
             // check if the widget hasn't been disposed of after an asynchronous action
             if (!showErrorMsg) {
-              Navigator.pop(context);
+              if (is_org) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignUpOrgScreen(),
+                  ),
+                );
+              } else {
+                Navigator.pop(context);
+              }
             }
           }
         },
