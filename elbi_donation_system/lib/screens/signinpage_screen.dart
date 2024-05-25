@@ -160,7 +160,7 @@ class _SignInPageState extends State<SignInPage> {
                 .authService
                 .signIn(email!, password!);
 
-            print(test1);
+            print("Submit button: ${test1}");
             print(showSignInErrorMessage);
 
             setState(
