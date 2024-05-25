@@ -42,7 +42,8 @@ class _SignUpOrgScreenState extends State<SignUpOrgScreen> {
       });
 
       if (_image != null) {
-        // navigate to the PendingOrgScreen
+        // pop the current screen and then navigate to the PendingOrgScreen
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => PendingOrgScreen()),
