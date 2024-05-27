@@ -1,25 +1,32 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/providers/donatepage_provider.dart';
+import 'package:elbi_donation_system/screens/donation_success_screen.dart';
 import 'package:elbi_donation_system/textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class DonatePage extends StatefulWidget {
-  const DonatePage({super.key, required String orgId});
+  final String orgId;
+
+  const DonatePage({super.key, required this.orgId});
 
   @override
   DonatePageState createState() => DonatePageState();
 }
 
 class DonatePageState extends State<DonatePage> {
-  final List<String> categories = ['Food', 'Clothes', 'Cash', 'Necessities', 'Others'];
+  final List<String> categories = ['Food', 'Clothes', 'Necessities', 'Others'];
   final Map<String, bool> selectedCategories = {};
   String deliveryMethod = 'Pickup';
   String weight = '';
   XFile? imageFile;
   final ImagePicker picker = ImagePicker();
   DateTime? pickupDropoffDateTime;
-
+  String? selectedAddress;
+  String? contactNumber;
   @override
   void initState() {
     super.initState();
@@ -30,7 +37,8 @@ class DonatePageState extends State<DonatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final imageProvider = Provider.of<ImageSelect>(context, listen: false);
+    final provider = Provider.of<DonatepageProvider>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Donate'),
@@ -122,7 +130,7 @@ class DonatePageState extends State<DonatePage> {
                                 leading: const Icon(Icons.photo_library),
                                 title: const Text('Photo from Library'),
                                 onTap: () {
-                                  imageProvider.pickImage(ImageSource.gallery);
+                                  provider.pickImage(ImageSource.gallery);
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -130,7 +138,7 @@ class DonatePageState extends State<DonatePage> {
                                 leading: const Icon(Icons.photo_camera),
                                 title: const Text('Take a Photo'),
                                 onTap: () {
-                                  imageProvider.pickImage(ImageSource.camera);
+                                  provider.pickImage(ImageSource.camera);
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -156,9 +164,9 @@ class DonatePageState extends State<DonatePage> {
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: imageProvider.image != null
+                          child: provider.image != null
                               ? Image.file(
-                                  imageProvider.image!,
+                                  provider.image!,
                                   fit: BoxFit.cover,
                                 )
                               : Icon(
@@ -173,7 +181,11 @@ class DonatePageState extends State<DonatePage> {
               ),
               Card(
                 child: ListTile(
-                  title: const Text('Pickup/Drop-off Date and Time'),
+                  title: const Text('Pickup/Drop-off Date'),
+                  subtitle: pickupDropoffDateTime != null
+                      ? Text(
+                          'Selected date: ${DateFormat('MM/dd/yyyy').format(pickupDropoffDateTime!)}')
+                      : null,
                   trailing: ElevatedButton(
                     onPressed: () async {
                       final DateTime? picked = await showDatePicker(
@@ -188,10 +200,62 @@ class DonatePageState extends State<DonatePage> {
                         });
                       }
                     },
-                    child: const Text('Select Date'),
+                    child: const Icon(Icons.calendar_today_rounded),
                   ),
                 ),
               ),
+              if (deliveryMethod == 'Pickup') ...[
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Pickup Details',
+                      style: AppTextStyles.cardHeader,
+                    ),
+                  ),
+                ),
+                FutureBuilder<DocumentSnapshot>(
+                  future: provider.getDonorData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return const Center(child: Text('Error'));
+                    } else {
+                      DocumentSnapshot donorSnapshot = snapshot.data!;
+                      Map<String, String> addresses =
+                          Map<String, String>.from(donorSnapshot.get('addresses'));
+                      contactNumber = donorSnapshot.get('contact_no');
+                      selectedAddress ??= addresses.entries.first.value;
+                      return Column(
+                        children: [
+                          ...addresses.entries.map((entry) {
+                            return Card(
+                              child: RadioListTile<String>(
+                                title: Text(entry.value),
+                                value: entry.key,
+                                groupValue: selectedAddress,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    selectedAddress = value;
+                                  });
+                                },
+                              ),
+                            );
+                          }),
+                          Card(
+                            child: ListTile(
+                              title: const Text('Contact Number for Pickup'),
+                              trailing: Text(contactNumber!),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
+              ],
             ],
           ),
         ),
@@ -199,8 +263,37 @@ class DonatePageState extends State<DonatePage> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ElevatedButton(
-          onPressed: () {
-            // Do nothing for now
+          onPressed: () async {
+            var imgUrl = await provider.uploadImage();
+            final donation = Donation(
+              dateTime: pickupDropoffDateTime!,
+              deliveryMethod: deliveryMethod,
+              image: imgUrl,
+              itemCategory: ItemCategory(
+                clothes: selectedCategories['Clothes']!,
+                food: selectedCategories['Food']!,
+                necessities: selectedCategories['Necessities']!,
+                others: selectedCategories['Others']!,
+              ),
+              orgDonor: provider.getUser()!.uid,
+              weight: double.parse(weight),
+              orgID: widget.orgId,
+              selectedAddress: selectedAddress,
+              contactNumber: contactNumber,
+              createTime: DateTime.now(),
+              status: DonationStatus(status: Status.Pending),
+            );
+            await provider.donate(donation);
+            String orgName = await provider.getOrgName(widget.orgId);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DonationSuccessScreen(
+                  orgName: orgName,
+                  donorID: provider.getUser()!.uid,
+                ),
+              ),
+            );
           },
           child: const Text('Donate'),
         ),

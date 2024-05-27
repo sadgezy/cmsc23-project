@@ -20,7 +20,6 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: userStream,
       builder: (context, snapshot) {
-        // snapshot.connectionState == ConnectionState.waiting;
         if (snapshot.hasError) {
           return Scaffold(
             body: Center(

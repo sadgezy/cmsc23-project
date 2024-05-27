@@ -1,7 +1,10 @@
 import 'package:elbi_donation_system/providers/donatepage_provider.dart';
+import 'package:elbi_donation_system/providers/donations_provider.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
 import 'package:elbi_donation_system/screens/bypass_screen.dart';
 import 'package:elbi_donation_system/screens/donatepage_screen.dart';
+import 'package:elbi_donation_system/screens/homepage_screen.dart';
+import 'package:elbi_donation_system/screens/my_donations_screen.dart';
 // import 'package:elbi_donation_system/screens/homepage_screen.dart';
 // import 'package:elbi_donation_system/screens/signuppage_screen.dart';
 // import 'package:elbi_donation_system/screens/signinpage_screen.dart';
@@ -26,7 +29,10 @@ void main() async {
           create: (context) => OrgsProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => ImageSelect(),
+          create: (context) => DonatepageProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => MyDonationsProvider(),
         ),
       ],
       child: const MainApp(),
@@ -52,8 +58,12 @@ class MainApp extends StatelessWidget {
       routes: {
         // '/': (context) => const SignInPage(),
         '/': (context) => const HomePage(),
-        '/donate': (context) => DonatePage(
-            orgId: ModalRoute.of(context)!.settings.arguments as String),
+        '/home': (context) => const HomeScreen(),
+        '/donate': (context) =>
+            DonatePage(orgId: ModalRoute.of(context)!.settings.arguments as String),
+        '/donations': (context) => MyDonationsScreen(
+              currentUserId: ModalRoute.of(context)!.settings.arguments as String,
+            ),
       },
     );
   }

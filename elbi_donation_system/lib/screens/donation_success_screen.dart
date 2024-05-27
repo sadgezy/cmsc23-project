@@ -1,0 +1,62 @@
+import 'package:elbi_donation_system/screens/my_donations_screen.dart';
+import 'package:flutter/material.dart';
+
+class DonationSuccessScreen extends StatelessWidget {
+  final String orgName;
+  final String donorID;
+
+  const DonationSuccessScreen({super.key, required this.orgName, required this.donorID});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.green,
+              size: 100,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Thank you for your donation to $orgName!',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const Text(
+              'Your generous contribution will make a difference.',
+              style: TextStyle(
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyDonationsScreen(currentUserId: donorID),
+                  ),
+                );
+              },
+              child: const Text(
+                'View My Donations',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

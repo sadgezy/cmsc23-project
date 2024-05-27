@@ -28,7 +28,7 @@ class EdsDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('Donations'),
+            title: const Text('My Donations'),
             onTap: () {
               if (ModalRoute.of(context)?.settings.name != "/donations") {
                 Navigator.pop(context);
@@ -42,6 +42,7 @@ class EdsDrawer extends StatelessWidget {
             onTap: () {
               context.read<UserAuthProvider>().signOut();
               Navigator.pop(context);
+              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
           ),
         ],
