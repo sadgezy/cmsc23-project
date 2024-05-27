@@ -61,9 +61,15 @@ class DonatepageProvider with ChangeNotifier {
   Future donate(Donation donation) async {
     try {
       await _firebaseOrgApi.addDonation(donation);
+      _image = null;
       print('Donation completed');
     } catch (e) {
       print(e);
     }
+  }
+
+  void clear() {
+    _image = null;
+    notifyListeners();
   }
 }
