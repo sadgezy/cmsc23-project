@@ -4,23 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/auth_provider.dart';
-
 class DonatePage extends StatefulWidget {
   const DonatePage({super.key, required String orgId});
 
   @override
-  _DonatePageState createState() => _DonatePageState();
+  DonatePageState createState() => DonatePageState();
 }
 
-class _DonatePageState extends State<DonatePage> {
-  final List<String> categories = [
-    'Food',
-    'Clothes',
-    'Cash',
-    'Necessities',
-    'Others'
-  ];
+class DonatePageState extends State<DonatePage> {
+  final List<String> categories = ['Food', 'Clothes', 'Cash', 'Necessities', 'Others'];
   final Map<String, bool> selectedCategories = {};
   String deliveryMethod = 'Pickup';
   String weight = '';
@@ -124,28 +116,25 @@ class _DonatePageState extends State<DonatePage> {
                       context: context,
                       builder: (BuildContext bc) {
                         return SafeArea(
-                          child: Container(
-                            child: Wrap(
-                              children: <Widget>[
-                                ListTile(
-                                  leading: const Icon(Icons.photo_library),
-                                  title: const Text('Photo from Library'),
-                                  onTap: () {
-                                    imageProvider
-                                        .pickImage(ImageSource.gallery);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.photo_camera),
-                                  title: const Text('Take a Photo'),
-                                  onTap: () {
-                                    imageProvider.pickImage(ImageSource.camera);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            ),
+                          child: Wrap(
+                            children: <Widget>[
+                              ListTile(
+                                leading: const Icon(Icons.photo_library),
+                                title: const Text('Photo from Library'),
+                                onTap: () {
+                                  imageProvider.pickImage(ImageSource.gallery);
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.photo_camera),
+                                title: const Text('Take a Photo'),
+                                onTap: () {
+                                  imageProvider.pickImage(ImageSource.camera);
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
                           ),
                         );
                       },

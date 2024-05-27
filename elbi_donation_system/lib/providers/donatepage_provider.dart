@@ -13,8 +13,6 @@ class ImageSelect with ChangeNotifier {
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       notifyListeners();
-    } else {
-      print('No image selected.');
-    }
+    } else {}
   }
 }

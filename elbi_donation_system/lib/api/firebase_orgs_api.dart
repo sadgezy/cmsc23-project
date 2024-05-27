@@ -21,13 +21,11 @@ class FirebaseOrgsAPI {
   }
 
   Future<String> getImageUrl(String imagePath) async {
-    print('imagePath: $imagePath');
     try {
       var path = Uri.parse(imagePath).path;
       var imgURL = await storage.ref(path).getDownloadURL();
       return imgURL;
     } catch (e) {
-      print('Error occurred while getting image URL: $e');
       throw Exception('Invalid image data');
     }
   }

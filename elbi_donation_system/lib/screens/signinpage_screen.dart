@@ -71,9 +71,7 @@ class _SignInPageState extends State<SignInPage> {
         padding: const EdgeInsets.only(bottom: 30),
         child: TextFormField(
           decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              label: Text("Password"),
-              hintText: "******"),
+              border: OutlineInputBorder(), label: Text("Password"), hintText: "******"),
           obscureText: true,
           onSaved: (value) => setState(() => password = value),
           validator: (value) {
@@ -159,9 +157,6 @@ class _SignInPageState extends State<SignInPage> {
                 .read<UserAuthProvider>()
                 .authService
                 .signIn(email!, password!);
-
-            print(test1);
-            print(showSignInErrorMessage);
 
             setState(
               () {
