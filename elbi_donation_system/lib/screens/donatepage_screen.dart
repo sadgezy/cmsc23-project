@@ -234,7 +234,7 @@ class DonatePageState extends State<DonatePage> {
                             return Card(
                               child: RadioListTile<String>(
                                 title: Text(entry.value),
-                                value: entry.key,
+                                value: entry.value,
                                 groupValue: selectedAddress,
                                 onChanged: (String? value) {
                                   setState(() {
