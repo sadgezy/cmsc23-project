@@ -18,11 +18,12 @@ class EDSListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textStyles = AppTextStyles(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: SizedBox(
         height: 125,
-        child: Card(
+        child: Center(
           child: ListTile(
             leading: CircleAvatar(
               child: ClipOval(
@@ -37,7 +38,7 @@ class EDSListTile extends StatelessWidget {
             ),
             title: Text(
               title,
-              style: AppTextStyles.title,
+              style: textStyles.title,
             ),
             subtitle: Text(
               subtitle,

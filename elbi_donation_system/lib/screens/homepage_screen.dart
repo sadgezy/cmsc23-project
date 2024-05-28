@@ -3,6 +3,7 @@ import 'package:elbi_donation_system/custom_widgets/eds_drawer.dart';
 import 'package:elbi_donation_system/custom_widgets/eds_listtile.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -49,7 +50,9 @@ class HomeScreen extends StatelessWidget {
         body: StreamBuilder<QuerySnapshot>(
           stream: Provider.of<OrgsProvider>(context).orgsStream,
           builder: (context, snapshot) {
-            if (snapshot.hasError) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
               return const Center(child: Text('Error'));
             } else {
               return Column(
@@ -64,31 +67,30 @@ class HomeScreen extends StatelessWidget {
                               .getImageUrl(org?['orgLogo']),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Shimmer.fromColors(
-                                baseColor: Theme.of(context).primaryColor,
-                                highlightColor:
-                                    Theme.of(context).primaryColor.withOpacity(0.5),
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 100.0,
-                                  color: Colors.white,
-                                ),
-                              );
+                              return Center(child: Container());
                             } else if (snapshot.hasError) {
                               return const Center(child: Text('Error loading image'));
                             } else {
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/donate',
-                                    arguments: org?.id,
-                                  );
-                                },
-                                child: EDSListTile(
-                                  logoUrl: snapshot.data!,
-                                  title: org?['orgName'],
-                                  subtitle: org?['orgMotto'],
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Card(
+                                  child: InkWell(
+                                    onTap: () {
+                                      Future.delayed(const Duration(milliseconds: 200),
+                                          () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/donate',
+                                          arguments: org?.id,
+                                        );
+                                      });
+                                    },
+                                    child: EDSListTile(
+                                      logoUrl: snapshot.data!,
+                                      title: org?['orgName'],
+                                      subtitle: org?['orgMotto'],
+                                    ),
+                                  ),
                                 ),
                               );
                             }

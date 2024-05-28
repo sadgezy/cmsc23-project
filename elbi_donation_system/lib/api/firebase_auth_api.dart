@@ -50,6 +50,8 @@ class FirebaseAuthAPI {
                 'addresses': addresses,
                 'is_org': isOrg,
                 'id': userCredential.user!.uid,
+                'profile_picture':
+                    'gs://elbi-donation-system-37957.appspot.com/profile_pictures/Windows_10_Default_Profile_Picture.svg.png',
               },
             );
           }

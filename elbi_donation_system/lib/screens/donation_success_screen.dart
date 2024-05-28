@@ -30,12 +30,15 @@ class DonationSuccessScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            const Text(
-              'Your generous contribution will make a difference.',
-              style: TextStyle(
-                fontSize: 16,
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Your generous contribution will make a difference.',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
             TextButton(
               onPressed: () {
@@ -46,11 +49,11 @@ class DonationSuccessScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text(
+              child: Text(
                 'View My Donations',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
