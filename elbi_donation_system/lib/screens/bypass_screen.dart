@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/homepage_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,14 +39,32 @@ class _HomePageState extends State<HomePage> {
           return const SignInPage();
         }
         User? user = snapshot.data;
+        Future<DocumentSnapshot?> userData =
+            Provider.of<UserProvider>(context, listen: false)
+                .getUserDetailsById(user!.uid);
+        print("The email: ${user.email}");
 
-        print("The email: ${user?.email}");
+        return FutureBuilder<DocumentSnapshot?>(
+          future: userData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              Map<String, dynamic> userData =
+                  (snapshot.data?.data() as Map<String, dynamic>?) ?? {};
 
-        if (user?.email == 'admin@gmail.com') {
-          return const AdminScreen();
-        } else {
-          return const HomeScreen();
-        }
+              if (userData['user_type'] == 'admin') {
+                return const AdminScreen();
+              } else if (userData['user_type'] == 'donor') {
+                return const HomeScreen();
+              } else {
+                return const HomeScreen();
+              }
+            }
+          },
+        );
       },
     );
   }

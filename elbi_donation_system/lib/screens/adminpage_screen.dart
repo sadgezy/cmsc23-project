@@ -16,7 +16,7 @@ class AdminScreen extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(child: Text('Hello, ADMIN')),
+          const DrawerHeader(child: Text('Hello, ADMIN')),
           ListTile(
             title: const Text('Donations'),
             onTap: () {
@@ -50,9 +50,8 @@ class AdminScreen extends StatelessWidget {
               onTap: () => Scaffold.of(context).openDrawer(),
               child: Builder(
                 builder: (context) {
-                  final initials =
-                      Provider.of<UserAuthProvider>(context, listen: false)
-                          .getUserInitials();
+                  final initials = Provider.of<UserAuthProvider>(context, listen: false)
+                      .getUserInitials();
                   return InkWell(
                     onTap: () => Scaffold.of(context).openDrawer(),
                     child: CircleAvatar(
@@ -78,8 +77,8 @@ class AdminScreen extends StatelessWidget {
             // Section for viewing organizations and donations
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Organizations",
-                  style: Theme.of(context).textTheme.headlineLarge),
+              child:
+                  Text("Organizations", style: Theme.of(context).textTheme.headlineLarge),
             ),
             StreamBuilder<QuerySnapshot>(
               stream: Provider.of<OrgsProvider>(context).orgs,
@@ -89,43 +88,45 @@ class AdminScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return const Center(child: Text('Error'));
                 } else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: snapshot.data?.docs.length ?? 0,
-                    itemBuilder: (context, index) {
-                      var org = snapshot.data?.docs[index];
-                      return FutureBuilder<String>(
-                        future:
-                            Provider.of<OrgsProvider>(context, listen: false)
-                                .getImageUrl(org?['orgLogo']),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return const Center(
-                                child: Text('Error loading image'));
-                          } else {
-                            return InkWell(
-                              onTap: () {
-                                // Navigator.pushNamed(
-                                //   context,
-                                //   '/donate',
-                                //   arguments: org?.id,
-                                // );
-                              },
-                              child: EDSListTile(
-                                logoUrl: snapshot.data!,
-                                title: org?['orgName'],
-                                subtitle: org?['orgMotto'],
+                  return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    child: Expanded(
+                      child: ListView.builder(
+                        itemCount: snapshot.data?.docs
+                                .where((org) => org['is_verified'] == true)
+                                .length ??
+                            0,
+                        itemBuilder: (context, index) {
+                          var org = snapshot.data?.docs
+                              .where((org) => org['is_verified'] == true)
+                              .elementAt(index);
+                          if (org!['is_verified'] == true) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Card(
+                                child: InkWell(
+                                  onTap: () {
+                                    Future.delayed(const Duration(milliseconds: 200), () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/donate',
+                                        arguments: org.id,
+                                      );
+                                    });
+                                  },
+                                  child: EDSListTile(
+                                    logoUrl: org['orgLogo'],
+                                    title: org['orgName'],
+                                    subtitle: org['orgMotto'],
+                                  ),
+                                ),
                               ),
                             );
                           }
+                          return null;
                         },
-                      );
-                    },
+                      ),
+                    ),
                   );
                 }
               },
@@ -164,16 +165,14 @@ class AdminScreen extends StatelessWidget {
                             IconButton(
                               icon: const Icon(Icons.check),
                               onPressed: () async {
-                                Provider.of<OrgsProvider>(context,
-                                    listen: false);
+                                Provider.of<OrgsProvider>(context, listen: false);
                                 // .approveOrganization(org?.id);
                               },
                             ),
                             IconButton(
                               icon: const Icon(Icons.close),
                               onPressed: () async {
-                                Provider.of<OrgsProvider>(context,
-                                    listen: false);
+                                Provider.of<OrgsProvider>(context, listen: false);
                                 // .rejectOrganization(org?.id);
                               },
                             ),
@@ -188,8 +187,7 @@ class AdminScreen extends StatelessWidget {
             // Section for viewing all donors
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Donors",
-                  style: Theme.of(context).textTheme.headlineLarge),
+              child: Text("Donors", style: Theme.of(context).textTheme.headlineLarge),
             ),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
