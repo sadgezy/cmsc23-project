@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/models/organization_model.dart';
 import 'package:path/path.dart' as Path;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -88,6 +89,65 @@ class FirebaseOrgsAPI {
 
       print('Photo uploaded');
       return downloadUrl;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<List<String>> uploadProofPhotos(String orgName, List<File> images) async {
+    List<String> downloadUrls = [];
+
+    for (var image in images) {
+      String fileName = Path.basename(image.path);
+      Reference ref = await createProofFolder(orgName);
+      Reference fileRef = ref.child(fileName);
+
+      UploadTask uploadTask = fileRef.putFile(image);
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      downloadUrls.add(downloadUrl);
+    }
+
+    return downloadUrls;
+  }
+
+  Future<String> uploadOrgLogo(File photo) async {
+    try {
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child('org_logos/${Path.basename(photo.path)}');
+
+      UploadTask uploadTask = storageReference.putFile(photo);
+      await uploadTask.whenComplete(() => null);
+
+      // Get the gs path
+      String gsPath = 'gs://${storageReference.bucket}/${storageReference.fullPath}';
+
+      print('Photo uploaded');
+      return gsPath;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> addOrganization(Organization organization) async {
+    try {
+      await db.collection('organizations').add(organization.toMap());
+      print('Organization added');
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<Reference> createProofFolder(String orgName) async {
+    try {
+      return FirebaseStorage.instance
+          .ref()
+          .child('org_applications')
+          .child('$orgName proof');
     } catch (e) {
       print(e);
       rethrow;
