@@ -117,6 +117,8 @@
 //   }
 // }
 
+// import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -194,7 +196,8 @@ class _SignUpState extends State<SignUpPage> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Please enter an email";
-            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                .hasMatch(value)) {
               return "Please enter valid email format (user@email.com)";
             }
             return null;
@@ -370,12 +373,12 @@ class _SignUpState extends State<SignUpPage> {
                 .read<UserAuthProvider>()
                 .authService
                 .signUp(fname!, lname!, email!, password!, contactNo!,
-                    addresses, is_org);
+                    addresses, isOrg);
 
             // print(showErrorMsg);
             // print(errorMsg);
-            // print(test);
-
+            print(test);
+            print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
             setState(
               () {
                 if (test != null && test.isNotEmpty) {
@@ -392,7 +395,10 @@ class _SignUpState extends State<SignUpPage> {
 
             // check if the widget hasn't been disposed of after an asynchronous action
             if (!showErrorMsg) {
-              if (is_org) {
+              if (isOrg) {
+                print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+                print(isOrg);
+                print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
                 Navigator.pop(context);
                 Navigator.push(
                   context,
@@ -401,7 +407,6 @@ class _SignUpState extends State<SignUpPage> {
                   ),
                 );
               } else {
-                if (mounted) {
                 Navigator.pop(context);
               }
             }
