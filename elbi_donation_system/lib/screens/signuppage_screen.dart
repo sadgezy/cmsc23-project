@@ -117,9 +117,12 @@
 //   }
 // }
 
+// import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'signuporg_screen.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -135,12 +138,12 @@ class _SignUpState extends State<SignUpPage> {
   String? fname;
   String? lname;
   String? errorMsg;
-  String? contact_no;
+  String? contactNo;
   Map<String, String> addresses = {
     'home': '',
     'work': '',
   };
-  bool is_org = false;
+  bool isOrg = false;
   bool showErrorMsg = false;
 
   @override
@@ -201,6 +204,7 @@ class _SignUpState extends State<SignUpPage> {
           },
         ),
       );
+
   Widget get name => Padding(
         padding: const EdgeInsets.only(bottom: 30),
         child: TextFormField(
@@ -217,6 +221,7 @@ class _SignUpState extends State<SignUpPage> {
           },
         ),
       );
+
   Widget get username => Padding(
         padding: const EdgeInsets.only(bottom: 30),
         child: TextFormField(
@@ -245,7 +250,7 @@ class _SignUpState extends State<SignUpPage> {
           onSaved: (value) => setState(() => password = value),
           validator: (value) {
             if (value == null || value.isEmpty || value.length < 6) {
-              return "Password must be atleast 6 characters long.";
+              return "Password must be at least 6 characters long.";
             }
             return null;
           },
@@ -260,7 +265,7 @@ class _SignUpState extends State<SignUpPage> {
               label: Text("Contact Number"),
               hintText: "09XXXXXXXXX"),
           obscureText: true,
-          onSaved: (value) => setState(() => contact_no = value),
+          onSaved: (value) => setState(() => contactNo = value),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Input a contact Number";
@@ -296,10 +301,10 @@ class _SignUpState extends State<SignUpPage> {
           children: [
             const Text('Apply for Org?'),
             Switch(
-              value: is_org,
+              value: isOrg,
               onChanged: (value) {
                 setState(() {
-                  is_org = value;
+                  isOrg = value;
                 });
               },
             ),
@@ -322,7 +327,7 @@ class _SignUpState extends State<SignUpPage> {
         return const Padding(
           padding: EdgeInsets.only(bottom: 30),
           child: Text(
-            "Password must be atleast 6 characters",
+            "Password must be at least 6 characters",
             style: TextStyle(color: Colors.red),
           ),
         );
@@ -367,13 +372,13 @@ class _SignUpState extends State<SignUpPage> {
             String? test = await context
                 .read<UserAuthProvider>()
                 .authService
-                .signUp(fname!, lname!, email!, password!, contact_no!,
-                    addresses, is_org!);
+                .signUp(fname!, lname!, email!, password!, contactNo!,
+                    addresses, isOrg);
 
-            print(showErrorMsg);
-            print(errorMsg);
+            // print(showErrorMsg);
+            // print(errorMsg);
             print(test);
-
+            print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
             setState(
               () {
                 if (test != null && test.isNotEmpty) {
@@ -384,13 +389,26 @@ class _SignUpState extends State<SignUpPage> {
                 }
               },
             );
-            print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
-            print(mounted);
-            print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+            // print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+            // print(mounted);
+            // print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
 
             // check if the widget hasn't been disposed of after an asynchronous action
             if (!showErrorMsg) {
-              Navigator.pop(context);
+              if (isOrg) {
+                print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+                print(isOrg);
+                print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignUpOrgScreen(),
+                  ),
+                );
+              } else {
+                Navigator.pop(context);
+              }
             }
           }
         },

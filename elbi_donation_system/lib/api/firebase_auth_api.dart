@@ -84,10 +84,9 @@ class FirebaseAuthAPI {
 
   Future<String?> signIn(String email, String password) async {
     try {
-      print(email);
-      UserCredential credentials = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      print(credentials);
+      // UserCredential credentials =
+      await auth.signInWithEmailAndPassword(email: email, password: password);
+      // print(credentials);
       return "Success";
     } on FirebaseException catch (e) {
       return (e.code);

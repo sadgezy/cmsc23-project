@@ -21,7 +21,6 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: userStream,
       builder: (context, snapshot) {
-        // snapshot.connectionState == ConnectionState.waiting;
         if (snapshot.hasError) {
           return Scaffold(
             body: Center(
@@ -37,16 +36,6 @@ class _HomePageState extends State<HomePage> {
         } else if (!snapshot.hasData || snapshot.data == null) {
           return const SignInPage();
         }
-
-        // if user is logged in, display the scaffold containing the streambuilder for the todos
-        print("===============");
-        print(context);
-        print("===============");
-        print(userStream);
-        print("Home Screen agad");
-        print(snapshot.data);
-        print("Bat ganono");
-
         User? user = snapshot.data;
 
         print("The email: ${user?.email}");
