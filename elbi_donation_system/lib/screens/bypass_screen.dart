@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import './signinpage_screen.dart';
+import './adminpage_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,8 +36,15 @@ class _HomePageState extends State<HomePage> {
         } else if (!snapshot.hasData || snapshot.data == null) {
           return const SignInPage();
         }
+        User? user = snapshot.data;
 
-        return const HomeScreen();
+        print("The email: ${user?.email}");
+
+        if (user?.email == 'admin@gmail.com') {
+          return const AdminScreen();
+        } else {
+          return const HomeScreen();
+        }
       },
     );
   }

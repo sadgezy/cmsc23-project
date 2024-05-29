@@ -157,7 +157,6 @@ class _SignInPageState extends State<SignInPage> {
                 .read<UserAuthProvider>()
                 .authService
                 .signIn(email!, password!);
-
             setState(
               () {
                 if (test1 != null && test1.isNotEmpty) {

@@ -18,10 +18,17 @@ class FirebaseAuthAPI {
     return auth.currentUser;
   }
 
-  Future<String?> signUp(String name, String userName, String email, String password,
-      String contactNo, Map<String, String> addresses, bool isOrg) async {
+  Future<String?> signUp(
+      String name,
+      String userName,
+      String email,
+      String password,
+      String contactNo,
+      Map<String, String> addresses,
+      bool isOrg) async {
     try {
-      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential =
+          await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
