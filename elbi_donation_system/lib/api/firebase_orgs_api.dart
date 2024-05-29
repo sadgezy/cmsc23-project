@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:elbi_donation_system/models/donation_model.dart';
 import 'package:elbi_donation_system/models/organization_model.dart';
-import 'package:path/path.dart' as Path;
+import 'package:path/path.dart' as path;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -26,7 +26,7 @@ class FirebaseOrgsAPI {
 
   Future<DocumentSnapshot> getDonor(String donorId) async {
     DocumentSnapshot donorSnapshot =
-        await FirebaseFirestore.instance.collection('donor_view').doc(donorId).get();
+        await FirebaseFirestore.instance.collection('users').doc(donorId).get();
     if (donorSnapshot.exists) {
       return donorSnapshot;
     } else {
@@ -63,7 +63,7 @@ class FirebaseOrgsAPI {
     try {
       Reference storageReference = FirebaseStorage.instance
           .ref()
-          .child('donation_photos/${Path.basename(photo.path)}');
+          .child('donation_photos/${path.basename(photo.path)}');
 
       UploadTask uploadTask = storageReference.putFile(photo);
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
@@ -81,7 +81,7 @@ class FirebaseOrgsAPI {
     try {
       Reference storageReference = FirebaseStorage.instance
           .ref()
-          .child('profile_pictures/${Path.basename(photo.path)}');
+          .child('profile_pictures/${path.basename(photo.path)}');
 
       UploadTask uploadTask = storageReference.putFile(photo);
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
@@ -99,7 +99,7 @@ class FirebaseOrgsAPI {
     List<String> downloadUrls = [];
 
     for (var image in images) {
-      String fileName = Path.basename(image.path);
+      String fileName = path.basename(image.path);
       Reference ref = await createProofFolder(orgName);
       Reference fileRef = ref.child(fileName);
 
@@ -116,7 +116,7 @@ class FirebaseOrgsAPI {
   Future<String> uploadOrgLogo(File photo) async {
     try {
       Reference storageReference =
-          FirebaseStorage.instance.ref().child('org_logos/${Path.basename(photo.path)}');
+          FirebaseStorage.instance.ref().child('org_logos/${path.basename(photo.path)}');
 
       UploadTask uploadTask = storageReference.putFile(photo);
       await uploadTask.whenComplete(() => null);
@@ -132,10 +132,12 @@ class FirebaseOrgsAPI {
     }
   }
 
-  Future<void> addOrganization(Organization organization) async {
+  Future<String> addOrganization(Organization organization) async {
     try {
-      await db.collection('organizations').add(organization.toMap());
+      DocumentReference docRef =
+          await db.collection('organizations').add(organization.toMap());
       print('Organization added');
+      return docRef.id;
     } catch (e) {
       print(e);
       rethrow;
@@ -172,7 +174,7 @@ class FirebaseOrgsAPI {
         'selected_address': donation.selectedAddress,
         'contact_number': donation.contactNumber,
         'create_time': donation.createTime,
-        'status': donation.status.status.toString().split('.').last,
+        'status': donation.status,
       });
 
       print('Donation added');

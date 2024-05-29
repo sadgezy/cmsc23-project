@@ -1,4 +1,4 @@
-import 'package:elbi_donation_system/screens/my_donations_screen.dart';
+import 'package:elbi_donation_system/screens/homepage_screen.dart';
 import 'package:flutter/material.dart';
 
 class DonationSuccessScreen extends StatelessWidget {
@@ -45,12 +45,12 @@ class DonationSuccessScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyDonationsScreen(currentUserId: donorID),
+                    builder: (context) => const HomeScreen(),
                   ),
                 );
               },
               child: Text(
-                'View My Donations',
+                'Go back to Homepage',
                 style: TextStyle(
                   fontSize: 16,
                   color: Theme.of(context).colorScheme.primary,

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Organization {
   final String name;
   final String motto;
@@ -21,5 +23,15 @@ class Organization {
       'is_verified': isVerified,
       'proofimages': proofImages,
     };
+  }
+
+  static Organization fromDocumentSnapshot(DocumentSnapshot doc) {
+    return Organization(
+      name: doc['orgName'],
+      motto: doc['orgMotto'],
+      logoUrl: doc['orgLogo'],
+      isVerified: doc['is_verified'],
+      proofImages: doc['proofimages'],
+    );
   }
 }
