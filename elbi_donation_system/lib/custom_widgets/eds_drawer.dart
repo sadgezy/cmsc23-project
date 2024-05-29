@@ -78,17 +78,17 @@ class EdsDrawer extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            title: const Text('Homepage'),
-            onTap: () {
-              if (ModalRoute.of(context)?.settings.name != "/home") {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, "/home");
-              } else {
-                Navigator.pop(context);
-              }
-            },
-          ),
+          // ListTile(
+          //   title: const Text('Homepage'),
+          //   onTap: () {
+          //     if (ModalRoute.of(context)?.settings.name != "/home") {
+          //       Navigator.pop(context);
+          //       Navigator.pushNamed(context, "/home");
+          //     } else {
+          //       Navigator.pop(context);
+          //     }
+          //   },
+          // ),
           ListTile(
             title: const Text('My Donations'),
             onTap: () {

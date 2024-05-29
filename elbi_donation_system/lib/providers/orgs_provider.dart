@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 class OrgsProvider extends ChangeNotifier {
   FirebaseOrgsAPI firebaseService = FirebaseOrgsAPI();
+  FirebaseFirestore db = FirebaseFirestore.instance;
   late Stream<QuerySnapshot> _orgsStream;
 
   OrgsProvider() {
@@ -20,6 +21,12 @@ class OrgsProvider extends ChangeNotifier {
 
   Future<String> getOrganizationId(String orgName) async {
     return await firebaseService.getOrganizationId(orgName);
+  }
+
+  Future<bool> getOrgStatus(String userId) async {
+    return await db.collection('users').doc(userId).get().then((value) {
+      return value['is_org'];
+    });
   }
 
   Future<String> getImageUrl(String imagePath) async {

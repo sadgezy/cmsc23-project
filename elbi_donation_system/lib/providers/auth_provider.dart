@@ -41,11 +41,13 @@ class UserAuthProvider with ChangeNotifier {
     String email,
     String password,
     String contactNo,
+    String profilePic,
+    String userType,
     Map<String, String> addresses,
     bool isOrg,
   ) async {
-    await authService.signUp(
-        name, userName, email, password, contactNo, addresses, isOrg);
+    await authService.signUp(name, userName, email, password, contactNo, profilePic,
+        userType, addresses, isOrg);
     notifyListeners();
   }
 

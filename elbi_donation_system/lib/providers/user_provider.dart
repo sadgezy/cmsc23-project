@@ -12,7 +12,7 @@ class UserProvider extends ChangeNotifier {
   File? get image => _image;
 
   Future<DocumentSnapshot> getUserDetailsById(String id) async {
-    return await db.collection('donor_view').doc(id).get();
+    return await db.collection('users').doc(id).get();
   }
 
   Future<DocumentSnapshot> getOrgDetails(String orgId) async {
