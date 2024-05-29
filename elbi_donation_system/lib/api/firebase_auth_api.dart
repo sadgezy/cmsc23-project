@@ -60,13 +60,14 @@ class FirebaseAuthAPI {
                 'id': userCredential.user!.uid,
                 'profile_picture': profilePicture,
                 'user_type': userType,
+                'org_id': '',
               },
             );
           }
         },
       );
 
-      return null; // Return null indicating success
+      return userCredential.user!.uid;
     } on FirebaseAuthException catch (e) {
       // Handle FirebaseAuthException
       if (e.code == 'weak-password') {

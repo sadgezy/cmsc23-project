@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/custom_widgets/eds_drawer.dart';
 import 'package:elbi_donation_system/custom_widgets/eds_listtile.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
-// import 'package:elbi_donation_system/screens/signuporg_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 
@@ -63,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                         .getUserStatus(userId),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       } else {

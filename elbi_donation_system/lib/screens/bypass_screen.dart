@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/homepage_screen.dart';
+import 'package:elbi_donation_system/screens/org_homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -57,8 +58,8 @@ class _HomePageState extends State<HomePage> {
 
               if (userData['user_type'] == 'admin') {
                 return const AdminScreen();
-              } else if (userData['user_type'] == 'donor') {
-                return const HomeScreen();
+              } else if (userData['user_type'] == 'org') {
+                return const OrganizationHomepage();
               } else {
                 return const HomeScreen();
               }

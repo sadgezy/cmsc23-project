@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class EdsDrawer extends StatelessWidget {
@@ -17,7 +14,6 @@ class EdsDrawer extends StatelessWidget {
 
   Drawer getDrawer(BuildContext context) {
     final userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
-    final displayName = userAuthProvider.getUserDisplayName();
     final userId = userAuthProvider.user!.uid;
     final provider = Provider.of<UserProvider>(context, listen: false);
 

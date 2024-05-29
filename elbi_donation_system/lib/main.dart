@@ -61,7 +61,6 @@ class MainApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        // '/': (context) => const SignInPage(),
         '/': (context) => const HomePage(),
         '/home': (context) => const HomeScreen(),
         '/donate': (context) =>

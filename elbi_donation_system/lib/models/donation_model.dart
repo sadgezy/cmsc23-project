@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Donation {
   final DateTime dateTime;
   final String deliveryMethod;
@@ -9,7 +11,7 @@ class Donation {
   final String? selectedAddress;
   final String? contactNumber;
   final DateTime createTime;
-  DonationStatus status;
+  final String status;
 
   Donation({
     required this.dateTime,
@@ -24,6 +26,26 @@ class Donation {
     required this.createTime,
     required this.status,
   });
+  static Donation fromDocumentSnapshot(DocumentSnapshot doc) {
+    return Donation(
+      dateTime: (doc['date_time'] as Timestamp).toDate(),
+      deliveryMethod: doc['delivery_method'],
+      image: doc['image'],
+      itemCategory: ItemCategory(
+        clothes: doc['item_category']['clothes'] ?? false,
+        food: doc['item_category']['food'] ?? false,
+        necessities: doc['item_category']['necessities'] ?? false,
+        others: doc['item_category']['others'] ?? false,
+      ),
+      orgDonor: doc['org_donor'],
+      orgID: doc['org_id'],
+      weight: doc['weight'],
+      selectedAddress: doc['selected_address'],
+      contactNumber: doc['contact_number'],
+      createTime: (doc['create_time'] as Timestamp).toDate(),
+      status: doc['status'],
+    );
+  }
 }
 
 class ItemCategory {
@@ -38,18 +60,4 @@ class ItemCategory {
     required this.necessities,
     required this.others,
   });
-}
-
-class DonationStatus {
-  final Status status;
-
-  DonationStatus({required this.status});
-}
-
-enum Status {
-  Pending,
-  Confirmed,
-  Completed,
-  Cancelled,
-  ScheduledForPickup,
 }

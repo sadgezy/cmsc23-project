@@ -5,13 +5,15 @@ import 'package:provider/provider.dart';
 import 'dart:io';
 
 class SignUpOrgScreen extends StatefulWidget {
-  const SignUpOrgScreen({super.key});
+  final String? userId;
+
+  const SignUpOrgScreen({super.key, this.userId});
 
   @override
-  _SignUpOrgScreenState createState() => _SignUpOrgScreenState();
+  SignUpOrgScreenState createState() => SignUpOrgScreenState();
 }
 
-class _SignUpOrgScreenState extends State<SignUpOrgScreen> {
+class SignUpOrgScreenState extends State<SignUpOrgScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _orgNameController = TextEditingController();
   final TextEditingController _orgMottoController = TextEditingController();
@@ -186,6 +188,7 @@ class _SignUpOrgScreenState extends State<SignUpOrgScreen> {
                             _images,
                             _orgNameController.text,
                             _orgMottoController.text,
+                            widget.userId!,
                           );
                           setState(() {
                             _isLoading = false;
