@@ -139,6 +139,9 @@ class _SignUpState extends State<SignUpPage> {
   String? lname;
   String? errorMsg;
   String? contactNo;
+  String profilePic =
+      'gs://elbi-donation-system-37957.appspot.com/profile_pictures/Windows_10_Default_Profile_Picture.svg.png';
+  String userType = 'donor';
   Map<String, String> addresses = {
     'home': '',
     'work': '',
@@ -196,8 +199,7 @@ class _SignUpState extends State<SignUpPage> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Please enter an email";
-            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                .hasMatch(value)) {
+            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
               return "Please enter valid email format (user@email.com)";
             }
             return null;
@@ -369,11 +371,16 @@ class _SignUpState extends State<SignUpPage> {
           if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
 
-            String? test = await context
-                .read<UserAuthProvider>()
-                .authService
-                .signUp(fname!, lname!, email!, password!, contactNo!,
-                    addresses, isOrg);
+            String? test = await context.read<UserAuthProvider>().authService.signUp(
+                fname!,
+                lname!,
+                email!,
+                password!,
+                contactNo!,
+                profilePic,
+                userType,
+                addresses,
+                isOrg);
 
             // print(showErrorMsg);
             // print(errorMsg);

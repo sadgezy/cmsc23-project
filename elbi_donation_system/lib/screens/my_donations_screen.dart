@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/appcolors.dart';
-import 'package:elbi_donation_system/custom_widgets/eds_drawer.dart';
 import 'package:elbi_donation_system/providers/donations_provider.dart';
 import 'package:elbi_donation_system/screens/donation_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ class MyDonationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const EdsDrawer(),
       appBar: AppBar(
         title: const Text('My Donations'),
       ),

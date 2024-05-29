@@ -24,11 +24,12 @@ class FirebaseAuthAPI {
       String email,
       String password,
       String contactNo,
+      String profilePicture,
+      String userType,
       Map<String, String> addresses,
       bool isOrg) async {
     try {
-      final UserCredential userCredential =
-          await auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -40,7 +41,7 @@ class FirebaseAuthAPI {
       await database.runTransaction(
         (Transaction transaction) async {
           DocumentReference donorViewref =
-              database.collection("donor_view").doc(userCredential.user!.uid);
+              database.collection("users").doc(userCredential.user!.uid);
 
           // check is user exists
           DocumentSnapshot snapshot = await transaction.get(donorViewref);
@@ -57,8 +58,8 @@ class FirebaseAuthAPI {
                 'addresses': addresses,
                 'is_org': isOrg,
                 'id': userCredential.user!.uid,
-                'profile_picture':
-                    'gs://elbi-donation-system-37957.appspot.com/profile_pictures/Windows_10_Default_Profile_Picture.svg.png',
+                'profile_picture': profilePicture,
+                'user_type': userType,
               },
             );
           }
