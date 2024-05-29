@@ -76,6 +76,24 @@ class FirebaseOrgsAPI {
     }
   }
 
+  Future<String> uploadProfilePhoto(File photo) async {
+    try {
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('profile_pictures/${Path.basename(photo.path)}');
+
+      UploadTask uploadTask = storageReference.putFile(photo);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+      print('Photo uploaded');
+      return downloadUrl;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<void> addDonation(Donation donation) async {
     try {
       await db.collection('donations').add({

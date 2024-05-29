@@ -4,17 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
 
-class DonationDetailsScreen extends StatelessWidget {
+class DonationDetailsScreen extends StatefulWidget {
   final String documentId;
 
   const DonationDetailsScreen({super.key, required this.documentId});
 
   @override
+  State<DonationDetailsScreen> createState() => _DonationDetailsScreenState();
+}
+
+class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
+  final screenshotController = ScreenshotController();
+  @override
   Widget build(BuildContext context) {
     Future<DocumentSnapshot<Object?>> data =
         Provider.of<MyDonationsProvider>(context, listen: false)
-            .getDonationDetailsById(documentId);
+            .getDonationDetailsById(widget.documentId);
     return FutureBuilder<DocumentSnapshot>(
       future: data,
       builder: (context, snapshot) {
@@ -75,7 +82,7 @@ class DonationDetailsScreen extends StatelessWidget {
                           .getOrgNameFromId(data['org_id']),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
+                          return Container();
                         } else if (snapshot.hasError) {
                           return const Text('Error');
                         } else {
@@ -121,11 +128,14 @@ class DonationDetailsScreen extends StatelessWidget {
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
-                                              const Text(
-                                                'Thanks for choosing to drop off your donation!',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold),
-                                                textAlign: TextAlign.center,
+                                              const Padding(
+                                                padding:
+                                                    EdgeInsets.symmetric(vertical: 8.0),
+                                                child: Text(
+                                                  'Show this QR code to the organization to confirm your donation.',
+                                                  style: TextStyle(fontSize: 16),
+                                                  textAlign: TextAlign.center,
+                                                ),
                                               ),
                                               const SizedBox(height: 10),
                                               Container(
@@ -137,19 +147,24 @@ class DonationDetailsScreen extends StatelessWidget {
                                                     MediaQuery.of(context).size.height *
                                                         0.3,
                                                 child: Center(
-                                                  child: QrImageView(
-                                                    data: documentId.toString(),
+                                                  child: Screenshot(
+                                                    controller: screenshotController,
+                                                    child: QrImageView(
+                                                      data: widget.documentId.toString(),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                              const Padding(
-                                                padding:
-                                                    EdgeInsets.symmetric(vertical: 8.0),
-                                                child: Text(
-                                                  'Show this QR code to the organization to confirm your donation.',
-                                                  style: TextStyle(fontSize: 16),
-                                                  textAlign: TextAlign.center,
-                                                ),
+                                              const SizedBox(height: 10),
+                                              FilledButton(
+                                                onPressed: () {
+                                                  Provider.of<MyDonationsProvider>(
+                                                          context,
+                                                          listen: false)
+                                                      .captureAndSaveQRCode(
+                                                          screenshotController);
+                                                },
+                                                child: const Text('Save QR Code'),
                                               ),
                                             ],
                                           ),
