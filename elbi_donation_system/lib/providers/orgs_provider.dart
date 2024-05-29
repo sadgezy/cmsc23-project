@@ -23,8 +23,12 @@ class OrgsProvider extends ChangeNotifier {
   }
 
   Future<String> getImageUrl(String imagePath) async {
-    var imgurl = await firebaseService.getImageUrl(imagePath);
-    print("Logo URL: $imgurl");
-    return imgurl;
+    try {
+      var imgurl = await firebaseService.getImageUrl(imagePath);
+      return imgurl;
+    } catch (error) {
+      print('Error fetching image URL: $error');
+      rethrow;
+    }
   }
 }

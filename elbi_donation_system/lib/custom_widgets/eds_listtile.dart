@@ -18,7 +18,6 @@ class EDSListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Logo URL: $logoUrl");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: SizedBox(

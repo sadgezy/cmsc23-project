@@ -136,12 +136,12 @@ class _SignUpState extends State<SignUpPage> {
   String? fname;
   String? lname;
   String? errorMsg;
-  String? contact_no;
+  String? contactNo;
   Map<String, String> addresses = {
     'home': '',
     'work': '',
   };
-  bool is_org = false;
+  bool isOrg = false;
   bool showErrorMsg = false;
 
   @override
@@ -194,8 +194,7 @@ class _SignUpState extends State<SignUpPage> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Please enter an email";
-            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                .hasMatch(value)) {
+            } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
               return "Please enter valid email format (user@email.com)";
             }
             return null;
@@ -263,7 +262,7 @@ class _SignUpState extends State<SignUpPage> {
               label: Text("Contact Number"),
               hintText: "09XXXXXXXXX"),
           obscureText: true,
-          onSaved: (value) => setState(() => contact_no = value),
+          onSaved: (value) => setState(() => contactNo = value),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Input a contact Number";
@@ -299,10 +298,10 @@ class _SignUpState extends State<SignUpPage> {
           children: [
             const Text('Apply for Org?'),
             Switch(
-              value: is_org,
+              value: isOrg,
               onChanged: (value) {
                 setState(() {
-                  is_org = value;
+                  isOrg = value;
                 });
               },
             ),
@@ -370,12 +369,12 @@ class _SignUpState extends State<SignUpPage> {
             String? test = await context
                 .read<UserAuthProvider>()
                 .authService
-                .signUp(fname!, lname!, email!, password!, contact_no!,
+                .signUp(fname!, lname!, email!, password!, contactNo!,
                     addresses, is_org);
 
-            print(showErrorMsg);
-            print(errorMsg);
-            print(test);
+            // print(showErrorMsg);
+            // print(errorMsg);
+            // print(test);
 
             setState(
               () {
@@ -387,9 +386,9 @@ class _SignUpState extends State<SignUpPage> {
                 }
               },
             );
-            print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
-            print(mounted);
-            print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+            // print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+            // print(mounted);
+            // print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
 
             // check if the widget hasn't been disposed of after an asynchronous action
             if (!showErrorMsg) {
@@ -402,6 +401,7 @@ class _SignUpState extends State<SignUpPage> {
                   ),
                 );
               } else {
+                if (mounted) {
                 Navigator.pop(context);
               }
             }
