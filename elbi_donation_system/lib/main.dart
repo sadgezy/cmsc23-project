@@ -4,6 +4,7 @@ import 'package:elbi_donation_system/providers/orgs_provider.dart';
 import 'package:elbi_donation_system/providers/user_provider.dart';
 import 'package:elbi_donation_system/screens/bypass_screen.dart';
 import 'package:elbi_donation_system/screens/donatepage_screen.dart';
+import 'package:elbi_donation_system/screens/edit_orgprofilepage_screen.dart';
 import 'package:elbi_donation_system/screens/homepage_screen.dart';
 import 'package:elbi_donation_system/screens/my_donations_screen.dart';
 import 'package:elbi_donation_system/screens/edit_profilepage_screen.dart';
@@ -70,6 +71,8 @@ class MainApp extends StatelessWidget {
             ),
         '/edit_profile': (context) =>
             EditProfilePage(userId: ModalRoute.of(context)!.settings.arguments as String),
+        '/edit_org_profile': (context) => EditOrgProfilePage(
+            orgId: ModalRoute.of(context)!.settings.arguments as String),
       },
     );
   }

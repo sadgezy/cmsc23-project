@@ -32,15 +32,45 @@ class OrgDrawer extends StatelessWidget {
               }
 
               Organization org = snapshot.data!;
-              return UserAccountsDrawerHeader(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                ),
-                accountName: Text(org.name),
-                accountEmail: Text(org.motto),
-                currentAccountPicture: CircleAvatar(
-                  backgroundImage: NetworkImage(org.logoUrl),
-                ),
+              return Column(
+                children: [
+                  UserAccountsDrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    accountName: Text(org.name),
+                    accountEmail: Text(org.motto),
+                    currentAccountPicture: CircleAvatar(
+                      backgroundImage: NetworkImage(org.logoUrl),
+                    ),
+                  ),
+                  FutureBuilder<String>(
+                    future: Provider.of<OrgsProvider>(context, listen: false)
+                        .getOrganizationId(org.name),
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+
+                      if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      }
+
+                      return FilledButton(
+                          onPressed: () {
+                            if (ModalRoute.of(context)?.settings.name !=
+                                "/edit_org_profile") {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, "/edit_org_profile",
+                                  arguments: snapshot.data);
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: const Text('Edit Org Profile'));
+                    },
+                  ),
+                ],
               );
             },
           ),

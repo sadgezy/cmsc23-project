@@ -97,7 +97,7 @@ class OrganizationHomepage extends StatelessWidget {
                                       child: Card(
                                         child: ListTile(
                                           title: Text('Donation from ${snapshot.data}'),
-                                          subtitle: Text('Weight: ${donation.weight} kg'),
+                                          subtitle: Text('Status: ${donation.status}'),
                                           trailing: IconButton(
                                             icon: const Icon(Icons.arrow_forward),
                                             onPressed: () {
@@ -131,7 +131,8 @@ class OrganizationHomepage extends StatelessWidget {
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                    return const CircularProgressIndicator();
+                                    return const Center(
+                                        child: CircularProgressIndicator());
                                   } else if (snapshot.hasError) {
                                     return Text('Error: ${snapshot.error}');
                                   } else {
@@ -141,7 +142,7 @@ class OrganizationHomepage extends StatelessWidget {
                                       child: Card(
                                         child: ListTile(
                                           title: Text('Donation from ${snapshot.data}'),
-                                          subtitle: Text('Weight: ${donation.weight} kg'),
+                                          subtitle: Text('Status: ${donation.status}'),
                                           trailing: IconButton(
                                             icon: const Icon(Icons.arrow_forward),
                                             onPressed: () {
