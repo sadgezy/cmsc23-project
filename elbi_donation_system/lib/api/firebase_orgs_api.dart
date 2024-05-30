@@ -175,6 +175,7 @@ class FirebaseOrgsAPI {
         'contact_number': donation.contactNumber,
         'create_time': donation.createTime,
         'status': donation.status,
+        'drive': donation.drive,
       });
       await docRef.update({'id': docRef.id});
       print('Donation added');
