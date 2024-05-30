@@ -12,6 +12,8 @@ class Donation {
   final String? contactNumber;
   final DateTime createTime;
   final String status;
+  final String drive;
+  final String? id;
 
   Donation({
     required this.dateTime,
@@ -25,6 +27,8 @@ class Donation {
     this.contactNumber,
     required this.createTime,
     required this.status,
+    required this.drive,
+    this.id,
   });
   static Donation fromDocumentSnapshot(DocumentSnapshot doc) {
     return Donation(
@@ -44,6 +48,8 @@ class Donation {
       contactNumber: doc['contact_number'],
       createTime: (doc['create_time'] as Timestamp).toDate(),
       status: doc['status'],
+      drive: doc['drive'],
+      id: doc.id,
     );
   }
 }

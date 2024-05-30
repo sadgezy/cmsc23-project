@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 
@@ -41,6 +42,31 @@ class MyDonationsProvider with ChangeNotifier {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<void> confirmStatus(BuildContext context, String donationId) async {
+    try {
+      DocumentReference docRef = db.collection('donations').doc(donationId);
+      DocumentSnapshot docSnap = await docRef.get();
+
+      if (!docSnap.exists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Donation does not exist')),
+        );
+        return;
+      }
+
+      await docRef.update({'status': 'Confirmed'});
+    } catch (e) {
+      throw Exception('Failed to confirm status');
+    }
+  }
+
+  Stream<String> getStatusStream(String donationId) {
+    return db.collection('donations').doc(donationId).snapshots().map((snapshot) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      return data['status'] ?? 'No status found';
+    });
   }
 
   Future<DocumentSnapshot> getDonationDetailsById(String donationId) async {
