@@ -105,13 +105,11 @@ class HomeScreen extends StatelessWidget {
                             child: Card(
                               child: InkWell(
                                 onTap: () {
-                                  Future.delayed(const Duration(milliseconds: 200), () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/donate',
-                                      arguments: org.id,
-                                    );
-                                  });
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/donate',
+                                    arguments: org.id,
+                                  );
                                 },
                                 child: EDSListTile(
                                   logoUrl: org['orgLogo'],

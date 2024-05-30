@@ -45,12 +45,16 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
             body: ListView(
               children: <Widget>[
                 ListTile(
-                    subtitle: ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    data['image'],
-                    width: 100,
+                    subtitle: SizedBox(
+                  height: 150,
+                  width: 300,
+                  child: ClipRRect(
+                    clipBehavior: Clip.hardEdge,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      data['image'],
+                      width: 100,
+                    ),
                   ),
                 )),
                 ListTile(
