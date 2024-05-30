@@ -289,6 +289,7 @@ class DonatePageState extends State<DonatePage> {
                       contactNumber: contactNumber,
                       createTime: DateTime.now(),
                       status: 'Pending',
+                      drive: '',
                     );
                     await provider.donate(donation);
 

@@ -1,5 +1,6 @@
 import 'package:elbi_donation_system/appcolors.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/providers/donations_provider.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,69 @@ class OrgDonationDetailsScreen extends StatefulWidget {
 class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
   final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
   String? code;
+  String dropdownValue = 'Pending';
+  @override
+  void initState() {
+    super.initState();
+    code = widget.donation.id;
+    dropdownValue = widget.donation.status;
+  }
+
+  void changeStatus(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String dropdownValue = 'Confirmed';
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Change Status'),
+              content: DropdownButton<String>(
+                value: dropdownValue,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                  });
+                },
+                items: <String>[
+                  'Confirmed',
+                  'Pending',
+                  'Completed',
+                  'Scheduled for Pick-up',
+                  'Cancelled'
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('Confirm'),
+                  onPressed: () async {
+                    if (widget.donation.id != null) {
+                      await Provider.of<MyDonationsProvider>(context, listen: false)
+                          .updateStatus(widget.donation.id!, dropdownValue);
+                      Navigator.of(context).pop();
+                    } else {
+                      print('Donation ID is null');
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,27 +171,49 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
                           title: const Text('Status'),
-                          subtitle: Text(
-                            widget.donation.status,
-                            style: TextStyle(
-                              color: () {
-                                switch (widget.donation.status) {
-                                  case 'Confirmed':
-                                    return AppColors.statusConfirmed;
-                                  case 'Pending':
-                                    return AppColors.statusPending;
-                                  case 'Closed':
-                                    return AppColors.statusClosed;
-                                  case 'Cancelled':
-                                    return AppColors.statusCancelled;
-                                  default:
-                                    return Colors.black;
-                                }
-                              }(),
-                            ),
+                          subtitle: StreamBuilder<String>(
+                            stream: code != null
+                                ? Provider.of<MyDonationsProvider>(context, listen: false)
+                                    .getStatusStream(code!)
+                                : Stream.value(widget.donation.status),
+                            builder:
+                                (BuildContext context, AsyncSnapshot<String> snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              }
+
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              }
+
+                              String status = snapshot.data!;
+                              return Text(
+                                status,
+                                style: TextStyle(
+                                  color: () {
+                                    switch (status) {
+                                      case 'Confirmed':
+                                        return AppColors.statusConfirmed;
+                                      case 'Pending':
+                                        return AppColors.statusPending;
+                                      case 'Closed':
+                                        return AppColors.statusClosed;
+                                      case 'Completed':
+                                        return AppColors.statusCompleted;
+                                      case 'Scheduled for Pick-up':
+                                        return AppColors.statusScheduledForPickup;
+                                      case 'Cancelled':
+                                        return AppColors.statusCancelled;
+                                      default:
+                                        return Colors.black;
+                                    }
+                                  }(),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -136,12 +222,13 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  if (widget.donation.deliveryMethod == 'Pickup')
+                  if (widget.donation.deliveryMethod == 'Pickup' &&
+                      widget.donation.status != 'Cancelled')
                     Card(
                       color: Theme.of(context).colorScheme.primaryContainer,
                       child: InkWell(
                         onTap: () {
-                          // Handle status change
+                          changeStatus(context);
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(16.0),
@@ -156,18 +243,22 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                         ),
                       ),
                     ),
-                  if (widget.donation.deliveryMethod == 'Drop-off')
+                  if (widget.donation.deliveryMethod == 'Drop-off' &&
+                      widget.donation.status != 'Cancelled')
                     Card(
                       color: Theme.of(context).colorScheme.primaryContainer,
                       child: InkWell(
                         onTap: () {
                           _qrBarCodeScannerDialogPlugin.getScannedQrBarCode(
                               context: context,
-                              onCode: (code) {
+                              onCode: (code) async {
                                 setState(() {
                                   this.code = code;
                                 });
                                 print(code);
+                                await Provider.of<MyDonationsProvider>(context,
+                                        listen: false)
+                                    .confirmStatus(context, code!);
                               });
                         },
                         child: const Padding(
@@ -182,24 +273,25 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                         ),
                       ),
                     ),
-                  Card(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    child: InkWell(
-                      onTap: () {
-                        // Handle donation drive selection
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          children: <Widget>[
-                            Icon(Icons.recycling, color: Colors.white),
-                            SizedBox(height: 4),
-                            Text('Choose Drive', style: TextStyle(color: Colors.white)),
-                          ],
+                  if (widget.donation.status != 'Cancelled')
+                    Card(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      child: InkWell(
+                        onTap: () {
+                          // Handle donation drive selection
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Column(
+                            children: <Widget>[
+                              Icon(Icons.recycling, color: Colors.white),
+                              SizedBox(height: 4),
+                              Text('Choose Drive', style: TextStyle(color: Colors.white)),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               )
             ],

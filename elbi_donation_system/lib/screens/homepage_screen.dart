@@ -71,18 +71,10 @@ class HomeScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(8.0),
                             child: Card(
                               color: Theme.of(context).colorScheme.secondary,
-                              child: ListTile(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => const SignUpOrgScreen(),
-                                  //   ),
-                                  // );
-                                },
-                                leading: const Icon(Icons.warning, color: Colors.black),
+                              child: const ListTile(
+                                leading: Icon(Icons.warning, color: Colors.black),
                                 textColor: Colors.black,
-                                title: const Text(
+                                title: Text(
                                     'Your organization\'s application is under review',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(

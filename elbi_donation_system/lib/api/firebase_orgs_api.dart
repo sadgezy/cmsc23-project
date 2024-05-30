@@ -158,7 +158,7 @@ class FirebaseOrgsAPI {
 
   Future<void> addDonation(Donation donation) async {
     try {
-      await db.collection('donations').add({
+      DocumentReference docRef = await db.collection('donations').add({
         'date_time': donation.dateTime,
         'delivery_method': donation.deliveryMethod,
         'image': donation.image,
@@ -176,7 +176,7 @@ class FirebaseOrgsAPI {
         'create_time': donation.createTime,
         'status': donation.status,
       });
-
+      await docRef.update({'id': docRef.id});
       print('Donation added');
     } catch (e) {
       print(e);
