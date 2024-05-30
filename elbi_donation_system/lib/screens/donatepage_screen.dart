@@ -40,7 +40,7 @@ class DonatePageState extends State<DonatePage> {
   Widget build(BuildContext context) {
     final provider = Provider.of<DonatepageProvider>(context, listen: true);
 
-    return isLoading
+    return !isLoading
         ? PopScope(
             onPopInvoked: (didPop) => didPop ? provider.clear() : null,
             child: Scaffold(
