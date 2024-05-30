@@ -95,8 +95,21 @@ class OrgsProvider extends ChangeNotifier {
     });
   }
 
+  Future<void> updateOrgDetails(String orgId, Map<String, dynamic> newDetails) async {
+    await db.collection('organizations').doc(orgId).update(newDetails);
+  }
+
   Future<DocumentSnapshot> getOrgDetailsById(String orgId) async {
     return await db.collection('organizations').doc(orgId).get();
+  }
+
+  Future<String> uploadLogo(File logo, String orgName) async {
+    final logoRef = FirebaseOrgsAPI.storage.ref().child('org_logos/${orgName}_logo');
+    final logoUploadTask = logoRef.putFile(logo);
+    final logoSnapshot = await logoUploadTask;
+    final logoUrl = await logoSnapshot.ref.getDownloadURL();
+
+    return logoUrl;
   }
 
   Future<void> submitForm(GlobalKey<FormState> formKey, File? logo,
@@ -104,10 +117,7 @@ class OrgsProvider extends ChangeNotifier {
     if (formKey.currentState!.validate()) {
       if (logo != null && proofImages != null && proofImages.isNotEmpty) {
         // Upload logo
-        final logoRef = FirebaseOrgsAPI.storage.ref().child('org_logos/${orgName}_logo');
-        final logoUploadTask = logoRef.putFile(logo);
-        final logoSnapshot = await logoUploadTask;
-        final logoUrl = await logoSnapshot.ref.getDownloadURL();
+        final logoUrl = await uploadLogo(logo, orgName);
 
         // Upload proof images
         await firebaseService.uploadProofPhotos(orgName, proofImages);
