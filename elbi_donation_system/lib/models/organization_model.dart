@@ -6,14 +6,16 @@ class Organization {
   final String logoUrl;
   final bool isVerified;
   final String proofImages;
+  Map<String, String>? drives;
 
-  Organization({
-    required this.name,
-    required this.motto,
-    required this.logoUrl,
-    required this.isVerified,
-    required this.proofImages,
-  });
+  Organization(
+      {required this.name,
+      required this.motto,
+      required this.logoUrl,
+      required this.isVerified,
+      required this.proofImages,
+      Map<String, String>? drives})
+      : drives = drives ?? {};
 
   Map<String, dynamic> toMap() {
     return {
@@ -22,6 +24,7 @@ class Organization {
       'orgLogo': logoUrl,
       'is_verified': isVerified,
       'proofimages': proofImages,
+      'donation_drives': drives,
     };
   }
 
@@ -32,6 +35,7 @@ class Organization {
       logoUrl: doc['orgLogo'],
       isVerified: doc['is_verified'],
       proofImages: doc['proofimages'],
+      drives: Map<String, String>.from(doc['donation_drives']),
     );
   }
 }
