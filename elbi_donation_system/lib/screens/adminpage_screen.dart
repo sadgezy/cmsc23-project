@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/screens/org_details_admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:elbi_donation_system/custom_widgets/eds_listtile.dart';
@@ -17,13 +18,13 @@ class AdminScreen extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           const DrawerHeader(child: Text('Hello, ADMIN')),
-          ListTile(
-            title: const Text('Donations'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, "/");
-            },
-          ),
+          // ListTile(
+          //   title: const Text('Donations'),
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //     Navigator.pushNamed(context, "/");
+          //   },
+          // ),
           ListTile(
             title: const Text('Logout'),
             onTap: () {
@@ -50,8 +51,9 @@ class AdminScreen extends StatelessWidget {
               onTap: () => Scaffold.of(context).openDrawer(),
               child: Builder(
                 builder: (context) {
-                  final initials = Provider.of<UserAuthProvider>(context, listen: false)
-                      .getUserInitials();
+                  final initials =
+                      Provider.of<UserAuthProvider>(context, listen: false)
+                          .getUserInitials();
                   return InkWell(
                     onTap: () => Scaffold.of(context).openDrawer(),
                     child: CircleAvatar(
@@ -74,64 +76,72 @@ class AdminScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Section for viewing organizations and donations
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child:
-                  Text("Organizations", style: Theme.of(context).textTheme.headlineLarge),
+              child: Text("Organizations",
+                  style: Theme.of(context).textTheme.headlineLarge),
             ),
-            StreamBuilder<QuerySnapshot>(
-              stream: Provider.of<OrgsProvider>(context).orgs,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Error'));
-                } else {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    child: Expanded(
-                      child: ListView.builder(
-                        itemCount: snapshot.data?.docs
+            Container(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: Provider.of<OrgsProvider>(context).orgs,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Error'));
+                  } else {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      child: Expanded(
+                        child: ListView.builder(
+                          itemCount: snapshot.data?.docs
+                                  .where((org) => org['is_verified'] == true)
+                                  .length ??
+                              0,
+                          itemBuilder: (context, index) {
+                            var org = snapshot.data?.docs
                                 .where((org) => org['is_verified'] == true)
-                                .length ??
-                            0,
-                        itemBuilder: (context, index) {
-                          var org = snapshot.data?.docs
-                              .where((org) => org['is_verified'] == true)
-                              .elementAt(index);
-                          if (org!['is_verified'] == true) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Card(
-                                child: InkWell(
-                                  onTap: () {
-                                    Future.delayed(const Duration(milliseconds: 200), () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/donate',
-                                        arguments: org.id,
-                                      );
-                                    });
-                                  },
-                                  child: EDSListTile(
-                                    logoUrl: org['orgLogo'],
-                                    title: org['orgName'],
-                                    subtitle: org['orgMotto'],
+                                .elementAt(index);
+                            if (org!['is_verified'] == true) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Card(
+                                  child: InkWell(
+                                    onTap: () {
+                                      // Future.delayed(
+                                      //   const Duration(milliseconds: 200),
+                                      //   () {
+                                      //     Navigator.pushNamed(
+                                      //       context,
+                                      //       '/donate',
+                                      //       arguments: org.id,
+                                      //     );
+                                      //   },
+                                      // );
+                                      print("This is Admin View");
+                                    },
+                                    child: EDSListTile(
+                                      logoUrl: org['orgLogo'],
+                                      title: org['orgName'],
+                                      subtitle: org['orgMotto'],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }
-                          return null;
-                        },
+                              );
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
-                  );
-                }
-              },
+                    );
+                  }
+                },
+              ),
             ),
-            // Section for approving organization sign up
+            const SizedBox(height: 16.0),
+            const Divider(height: 16.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text("Pending Organizations",
@@ -139,7 +149,7 @@ class AdminScreen extends StatelessWidget {
             ),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('donor_view')
+                  .collection('users')
                   .where('is_org', isEqualTo: true)
                   .snapshots(),
               builder: (context, snapshot) {
@@ -154,29 +164,44 @@ class AdminScreen extends StatelessWidget {
                     itemCount: snapshot.data?.docs.length ?? 0,
                     itemBuilder: (context, index) {
                       var org = snapshot.data?.docs[index];
-                      return ListTile(
-                        title: Text(org?['name']),
-                        subtitle: Text(org?['email']),
-                        // title: Text(org?['orgName']),
-                        // subtitle: Text(org?['orgMotto']),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.check),
-                              onPressed: () async {
-                                Provider.of<OrgsProvider>(context, listen: false);
-                                // .approveOrganization(org?.id);
-                              },
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrganizationDetailScreen(
+                                orgId: org?.id,
+                                orgName: org?['name'],
+                                orgEmail: org?['email'],
+                              ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () async {
-                                Provider.of<OrgsProvider>(context, listen: false);
-                                // .rejectOrganization(org?.id);
-                              },
-                            ),
-                          ],
+                          );
+                          print("Check Org Deets");
+                        },
+                        child: ListTile(
+                          title: Text(org?['name']),
+                          subtitle: Text(org?['email']),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.check),
+                                onPressed: () async {
+                                  Provider.of<OrgsProvider>(context,
+                                      listen: false);
+                                  // .approveOrganization(org?.id);
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () async {
+                                  Provider.of<OrgsProvider>(context,
+                                      listen: false);
+                                  // .rejectOrganization(org?.id);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -184,14 +209,16 @@ class AdminScreen extends StatelessWidget {
                 }
               },
             ),
-            // Section for viewing all donors
+            const SizedBox(height: 16.0),
+            const Divider(height: 16.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Donors", style: Theme.of(context).textTheme.headlineLarge),
+              child: Text("Donors",
+                  style: Theme.of(context).textTheme.headlineLarge),
             ),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('donor_view')
+                  .collection('users')
                   .where('is_org', isEqualTo: false)
                   .snapshots(),
               builder: (context, snapshot) {

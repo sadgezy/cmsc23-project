@@ -56,12 +56,24 @@ class OrgsProvider extends ChangeNotifier {
         .collection('users')
         .doc(auth.auth.currentUser!.uid)
         .snapshots()
-        .asyncMap((snapshot) async {
-      String orgId = snapshot.data()?['org_id'];
-      DocumentSnapshot orgSnapshot =
-          await FirebaseFirestore.instance.collection('organizations').doc(orgId).get();
-      return Organization.fromDocumentSnapshot(orgSnapshot);
-    });
+        .asyncMap(
+      (snapshot) async {
+        String orgId = snapshot.data()?['org_id'];
+        DocumentSnapshot orgSnapshot = await FirebaseFirestore.instance
+            .collection('organizations')
+            .doc(orgId)
+            .get();
+        return Organization.fromDocumentSnapshot(orgSnapshot);
+      },
+    );
+  }
+
+  Stream<Organization> getOrgDetailsStreamById(String? orgId) {
+    return FirebaseFirestore.instance
+        .collection('organizations')
+        .doc(orgId)
+        .snapshots()
+        .map((snapshot) => Organization.fromDocumentSnapshot(snapshot));
   }
 
   Stream<List<Donation>> getOrgDonationsStream(String orgId) {
@@ -69,8 +81,9 @@ class OrgsProvider extends ChangeNotifier {
         .collection('donations')
         .where('org_id', isEqualTo: orgId)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Donation.fromDocumentSnapshot(doc)).toList());
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Donation.fromDocumentSnapshot(doc))
+            .toList());
   }
 
   Future<Reference> createProofFolder(String orgName) async {
@@ -95,7 +108,8 @@ class OrgsProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> updateOrgDetails(String orgId, Map<String, dynamic> newDetails) async {
+  Future<void> updateOrgDetails(
+      String orgId, Map<String, dynamic> newDetails) async {
     await db.collection('organizations').doc(orgId).update(newDetails);
   }
 
@@ -104,7 +118,8 @@ class OrgsProvider extends ChangeNotifier {
   }
 
   Future<String> uploadLogo(File logo, String orgName) async {
-    final logoRef = FirebaseOrgsAPI.storage.ref().child('org_logos/${orgName}_logo');
+    final logoRef =
+        FirebaseOrgsAPI.storage.ref().child('org_logos/${orgName}_logo');
     final logoUploadTask = logoRef.putFile(logo);
     final logoSnapshot = await logoUploadTask;
     final logoUrl = await logoSnapshot.ref.getDownloadURL();
@@ -112,8 +127,13 @@ class OrgsProvider extends ChangeNotifier {
     return logoUrl;
   }
 
-  Future<void> submitForm(GlobalKey<FormState> formKey, File? logo,
-      List<File>? proofImages, String orgName, String orgMotto, String userId) async {
+  Future<void> submitForm(
+      GlobalKey<FormState> formKey,
+      File? logo,
+      List<File>? proofImages,
+      String orgName,
+      String orgMotto,
+      String userId) async {
     if (formKey.currentState!.validate()) {
       if (logo != null && proofImages != null && proofImages.isNotEmpty) {
         // Upload logo
@@ -139,8 +159,10 @@ class OrgsProvider extends ChangeNotifier {
 
   Future<String> getUserName(String donorId) async {
     try {
-      var userDoc =
-          await FirebaseFirestore.instance.collection('users').doc(donorId).get();
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(donorId)
+          .get();
       return userDoc.data()?['user_name'] ?? '';
     } catch (error) {
       print('Error fetching user name: $error');
