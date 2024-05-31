@@ -13,7 +13,8 @@ class EdsDrawer extends StatelessWidget {
   }
 
   Drawer getDrawer(BuildContext context) {
-    final userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
+    final userAuthProvider =
+        Provider.of<UserAuthProvider>(context, listen: false);
     final userId = userAuthProvider.user!.uid;
     final provider = Provider.of<UserProvider>(context, listen: false);
 
@@ -23,7 +24,8 @@ class EdsDrawer extends StatelessWidget {
         children: [
           FutureBuilder<DocumentSnapshot<Object?>>(
             future: provider.getUserDetailsById(userId),
-            builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasError) {
                 return const DrawerHeader(child: Text('Something went wrong'));
               }
@@ -32,12 +34,15 @@ class EdsDrawer extends StatelessWidget {
                 return DrawerHeader(child: Container());
               }
 
-              Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+              Map<String, dynamic> data =
+                  snapshot.data!.data() as Map<String, dynamic>;
               return FutureBuilder<String>(
                 future: provider.getImageUrl(data['profile_picture']),
-                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<String> snapshot) {
                   if (snapshot.hasError) {
-                    return const DrawerHeader(child: Text('Something went wrong'));
+                    return const DrawerHeader(
+                        child: Text('Something went wrong'));
                   }
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -102,7 +107,7 @@ class EdsDrawer extends StatelessWidget {
             onTap: () {
               context.read<UserAuthProvider>().signOut();
               Navigator.pop(context);
-              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+              // Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
           ),
         ],

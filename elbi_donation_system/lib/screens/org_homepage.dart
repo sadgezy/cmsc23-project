@@ -45,7 +45,8 @@ class OrganizationHomepage extends StatelessWidget {
               title: const Text("Organization Homepage"),
             ),
             body: FutureBuilder<String>(
-              future: Provider.of<OrgsProvider>(context).getOrganizationId(org!.name),
+              future: Provider.of<OrgsProvider>(context)
+                  .getOrganizationId(org!.name),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -54,8 +55,8 @@ class OrganizationHomepage extends StatelessWidget {
                 } else if (snapshot.hasData) {
                   final orgId = snapshot.data;
                   return StreamBuilder<List<Donation>>(
-                    stream:
-                        Provider.of<OrgsProvider>(context).getOrgDonationsStream(orgId!),
+                    stream: Provider.of<OrgsProvider>(context)
+                        .getOrgDonationsStream(orgId!),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -64,14 +65,18 @@ class OrganizationHomepage extends StatelessWidget {
                       } else if (snapshot.hasData) {
                         final donations = snapshot.data;
                         final pickupDonations = donations!
-                            .where((donation) => donation.deliveryMethod == 'Pickup')
+                            .where((donation) =>
+                                donation.deliveryMethod == 'Pickup')
                             .toList();
                         final dropOffDonations = donations
-                            .where((donation) => donation.deliveryMethod == 'Drop-off')
+                            .where((donation) =>
+                                donation.deliveryMethod == 'Drop-off')
                             .toList();
 
                         return ListView.builder(
-                          itemCount: pickupDonations.length + dropOffDonations.length + 2,
+                          itemCount: pickupDonations.length +
+                              dropOffDonations.length +
+                              2,
                           itemBuilder: (context, index) {
                             if (index == 0) {
                               return const Padding(
@@ -92,14 +97,17 @@ class OrganizationHomepage extends StatelessWidget {
                                     return Text('Error: ${snapshot.error}');
                                   } else {
                                     return Padding(
-                                      padding:
-                                          const EdgeInsets.symmetric(horizontal: 16.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0),
                                       child: Card(
                                         child: ListTile(
-                                          title: Text('Donation from ${snapshot.data}'),
-                                          subtitle: Text('Status: ${donation.status}'),
+                                          title: Text(
+                                              'Donation from ${snapshot.data}'),
+                                          subtitle: Text(
+                                              'Status: ${donation.status}'),
                                           trailing: IconButton(
-                                            icon: const Icon(Icons.arrow_forward),
+                                            icon:
+                                                const Icon(Icons.arrow_forward),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,
@@ -123,8 +131,8 @@ class OrganizationHomepage extends StatelessWidget {
                                 child: Text('Drop off Donations:'),
                               );
                             } else {
-                              final donation =
-                                  dropOffDonations[index - pickupDonations.length - 2];
+                              final donation = dropOffDonations[
+                                  index - pickupDonations.length - 2];
                               return FutureBuilder<String>(
                                 future: Provider.of<OrgsProvider>(context)
                                     .getUserName(donation.orgDonor),
@@ -137,14 +145,17 @@ class OrganizationHomepage extends StatelessWidget {
                                     return Text('Error: ${snapshot.error}');
                                   } else {
                                     return Padding(
-                                      padding:
-                                          const EdgeInsets.symmetric(horizontal: 16.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0),
                                       child: Card(
                                         child: ListTile(
-                                          title: Text('Donation from ${snapshot.data}'),
-                                          subtitle: Text('Status: ${donation.status}'),
+                                          title: Text(
+                                              'Donation from ${snapshot.data}'),
+                                          subtitle: Text(
+                                              'Status: ${donation.status}'),
                                           trailing: IconButton(
-                                            icon: const Icon(Icons.arrow_forward),
+                                            icon:
+                                                const Icon(Icons.arrow_forward),
                                             onPressed: () {
                                               Navigator.push(
                                                 context,

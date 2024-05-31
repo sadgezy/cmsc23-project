@@ -14,7 +14,8 @@ class OrgDrawer extends StatelessWidget {
 
   Drawer getDrawer(BuildContext context) {
     final orgsProvider = Provider.of<OrgsProvider>(context, listen: false);
-    final userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
+    final userAuthProvider =
+        Provider.of<UserAuthProvider>(context, listen: false);
 
     return Drawer(
       child: ListView(
@@ -22,7 +23,8 @@ class OrgDrawer extends StatelessWidget {
         children: [
           StreamBuilder<Organization>(
             stream: orgsProvider.getOrgDetailsStream(),
-            builder: (BuildContext context, AsyncSnapshot<Organization> snapshot) {
+            builder:
+                (BuildContext context, AsyncSnapshot<Organization> snapshot) {
               if (snapshot.hasError) {
                 return const DrawerHeader(child: Text('Something went wrong'));
               }
@@ -47,7 +49,8 @@ class OrgDrawer extends StatelessWidget {
                   FutureBuilder<String>(
                     future: Provider.of<OrgsProvider>(context, listen: false)
                         .getOrganizationId(org.name),
-                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    builder:
+                        (BuildContext context, AsyncSnapshot<String> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
@@ -79,7 +82,7 @@ class OrgDrawer extends StatelessWidget {
             onTap: () {
               userAuthProvider.signOut();
               Navigator.pop(context);
-              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+              // Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
             },
           ),
         ],
