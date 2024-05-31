@@ -10,24 +10,32 @@ class MyDonationsProvider with ChangeNotifier {
   final FirebaseFirestore db = FirebaseFirestore.instance;
 
   Stream<QuerySnapshot> getUserDonations(String userId) {
-    return db.collection('donations').where('org_donor', isEqualTo: userId).snapshots();
+    return db
+        .collection('donations')
+        .where('org_donor', isEqualTo: userId)
+        .snapshots();
   }
 
   Future<String> getOrgNameFromId(String orgId) async {
-    DocumentSnapshot orgDoc = await db.collection('organizations').doc(orgId).get();
+    DocumentSnapshot orgDoc =
+        await db.collection('organizations').doc(orgId).get();
     return orgDoc.get('orgName');
   }
 
   Future<String> updateStatus(String donationId, String status) async {
     try {
-      await db.collection('donations').doc(donationId).update({'status': status});
+      await db
+          .collection('donations')
+          .doc(donationId)
+          .update({'status': status});
       return 'Status updated';
     } catch (e) {
       throw Exception('Failed to update status');
     }
   }
 
-  Future<void> captureAndSaveQRCode(ScreenshotController screenshotController) async {
+  Future<void> captureAndSaveQRCode(
+      ScreenshotController screenshotController) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final path = directory.path;
@@ -61,7 +69,11 @@ class MyDonationsProvider with ChangeNotifier {
   }
 
   Stream<String> getStatusStream(String donationId) {
-    return db.collection('donations').doc(donationId).snapshots().map((snapshot) {
+    return db
+        .collection('donations')
+        .doc(donationId)
+        .snapshots()
+        .map((snapshot) {
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
       return data['status'] ?? 'No status found';
     });
@@ -69,7 +81,8 @@ class MyDonationsProvider with ChangeNotifier {
 
   Future<DocumentSnapshot> getDonationDetailsById(String donationId) async {
     try {
-      DocumentSnapshot donationDoc = await db.collection('donations').doc(donationId).get();
+      DocumentSnapshot donationDoc =
+          await db.collection('donations').doc(donationId).get();
       return donationDoc;
     } catch (e) {
       throw Exception('Failed to get donation details');
@@ -79,7 +92,8 @@ class MyDonationsProvider with ChangeNotifier {
   Future<List<String>> getDonationDrives() async {
     try {
       QuerySnapshot snapshot = await db.collection('donation-drives').get();
-      List<String> drives = snapshot.docs.map((doc) => doc['drive_name'] as String).toList();
+      List<String> drives =
+          snapshot.docs.map((doc) => doc['drive_name'] as String).toList();
       return drives;
     } catch (e) {
       print(e);
@@ -89,17 +103,32 @@ class MyDonationsProvider with ChangeNotifier {
 
   Future<void> updateDrive(String donationId, String driveName) async {
     try {
-      await db.collection('donations').doc(donationId).update({'drive': driveName});
+      await db
+          .collection('donations')
+          .doc(donationId)
+          .update({'drive': driveName});
       notifyListeners();
     } catch (e) {
       print(e);
     }
   }
 
+  Stream<String> getDriveStream(String donationId) {
+    return db
+        .collection('donations')
+        .doc(donationId)
+        .snapshots()
+        .map((snapshot) {
+      Map<String, dynamic>? data = snapshot.data();
+      return data?['drive'] ?? '';
+    });
+  }
+
   // Method to delete a donation
   Future<void> deleteDonation(BuildContext context, String donationId) async {
     try {
-      DocumentSnapshot donationSnapshot = await db.collection('donations').doc(donationId).get();
+      DocumentSnapshot donationSnapshot =
+          await db.collection('donations').doc(donationId).get();
       if (donationSnapshot.exists) {
         String status = donationSnapshot.get('status');
         if (status == 'Completed') {
@@ -108,7 +137,8 @@ class MyDonationsProvider with ChangeNotifier {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Cannot Delete Donation'),
-                content: const Text('This donation is already completed and cannot be deleted.'),
+                content: const Text(
+                    'This donation is already completed and cannot be deleted.'),
                 actions: <Widget>[
                   TextButton(
                     child: const Text('OK'),

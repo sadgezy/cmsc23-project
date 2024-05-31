@@ -86,7 +86,7 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
     );
   }
 
-  Future<void> chooseDrive(BuildContext context) async {
+  Future<void> chooseDrive(BuildContext context, String currentDrive) async {
     // Fetch the list of donation drives from the database
     final drives =
         await Provider.of<MyDonationsProvider>(context, listen: false)
@@ -112,7 +112,8 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
       );
     }
 
-    String selectedDrive = drives.first;
+    String selectedDrive =
+        currentDrive.isNotEmpty ? currentDrive : drives.first;
 
     showDialog(
       context: context,
@@ -279,9 +280,23 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
                           title: const Text('Donation Drive'),
-                          subtitle: Text(widget.donation.drive.isNotEmpty
-                              ? widget.donation.drive
-                              : 'Not in a Donation Drive'),
+                          subtitle: StreamBuilder<String>(
+                            stream: Provider.of<MyDonationsProvider>(context)
+                                .getDriveStream(widget.donation.id!),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<String> snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return Text(snapshot.data!.isNotEmpty
+                                    ? snapshot.data!
+                                    : 'Not in a Donation Drive');
+                              }
+                            },
+                          ),
                         ),
                       ),
                       Padding(
@@ -401,7 +416,7 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                       color: Theme.of(context).colorScheme.primaryContainer,
                       child: InkWell(
                         onTap: () {
-                          chooseDrive(context);
+                          chooseDrive(context, widget.donation.drive);
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
