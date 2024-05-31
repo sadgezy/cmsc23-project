@@ -20,6 +20,7 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
   final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
   String? code;
   String dropdownValue = 'Pending';
+  
   @override
   void initState() {
     super.initState();
@@ -83,7 +84,108 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
     );
   }
 
-  @override
+  Future<void> chooseDrive(BuildContext context) async {
+    // Fetch the list of donation drives from the database
+    final drives = await Provider.of<MyDonationsProvider>(context, listen: false).getDonationDrives();
+
+    if (drives.isEmpty) {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Choose Drive'),
+            content: const Text('No donation drives available.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    String selectedDrive = drives.first;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text('Choose Drive'),
+              content: DropdownButton<String>(
+                value: selectedDrive,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedDrive = newValue!;
+                  });
+                },
+                items: drives.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('Confirm'),
+                  onPressed: () async {
+                    if (widget.donation.id != null) {
+                      await Provider.of<MyDonationsProvider>(context, listen: false)
+                          .updateDrive(widget.donation.id!, selectedDrive);
+                      Navigator.of(context).pop();
+                    } else {
+                      print('Donation ID is null');
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void deleteDonation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this donation?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                await Provider.of<MyDonationsProvider>(context, listen: false)
+                    .deleteDonation(context, widget.donation.id!);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -231,13 +333,13 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                           changeStatus(context);
                         },
                         child: const Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: EdgeInsets.all(8.0),
                           child: Column(
                             children: <Widget>[
                               Icon(Icons.update, color: Colors.white),
-                              SizedBox(height: 4),
+                              SizedBox(height: 2),
                               Text('Change Status',
-                                  style: TextStyle(color: Colors.white)),
+                                  style: TextStyle(color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ),
@@ -262,12 +364,12 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                               });
                         },
                         child: const Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: EdgeInsets.all(8.0),
                           child: Column(
                             children: <Widget>[
                               Icon(Icons.qr_code, color: Colors.white),
-                              SizedBox(height: 4),
-                              Text('Scan QR Code', style: TextStyle(color: Colors.white)),
+                              SizedBox(height: 2),
+                              Text('Scan QR Code', style: TextStyle(color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ),
@@ -278,15 +380,35 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                       color: Theme.of(context).colorScheme.primaryContainer,
                       child: InkWell(
                         onTap: () {
-                          // Handle donation drive selection
+                          chooseDrive(context);
                         },
                         child: const Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: EdgeInsets.all(8.0),
                           child: Column(
                             children: <Widget>[
                               Icon(Icons.recycling, color: Colors.white),
-                              SizedBox(height: 4),
-                              Text('Choose Drive', style: TextStyle(color: Colors.white)),
+                              SizedBox(height: 2),
+                              Text('Choose Drive', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (widget.donation.status != 'Completed') // Check if the status is not completed
+                    Card(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      child: InkWell(
+                        onTap: () {
+                          deleteDonation(context);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Column(
+                            children: <Widget>[
+                              Icon(Icons.delete, color: Colors.white),
+                              SizedBox(height: 2),
+                              Text('Delete Donation', style: TextStyle(color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ),
