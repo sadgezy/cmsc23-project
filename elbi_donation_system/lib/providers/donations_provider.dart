@@ -13,9 +13,7 @@ class MyDonationsProvider with ChangeNotifier {
     return db.collection('donations').where('org_donor', isEqualTo: userId).snapshots();
   }
 
-  Future<String> getOrgNameFromId(
-    String orgId,
-  ) async {
+  Future<String> getOrgNameFromId(String orgId) async {
     DocumentSnapshot orgDoc = await db.collection('organizations').doc(orgId).get();
     return orgDoc.get('orgName');
   }
@@ -71,11 +69,74 @@ class MyDonationsProvider with ChangeNotifier {
 
   Future<DocumentSnapshot> getDonationDetailsById(String donationId) async {
     try {
-      DocumentSnapshot donationDoc =
-          await db.collection('donations').doc(donationId).get();
+      DocumentSnapshot donationDoc = await db.collection('donations').doc(donationId).get();
       return donationDoc;
     } catch (e) {
       throw Exception('Failed to get donation details');
+    }
+  }
+
+  Future<List<String>> getDonationDrives() async {
+    try {
+      QuerySnapshot snapshot = await db.collection('donation-drives').get();
+      List<String> drives = snapshot.docs.map((doc) => doc['drive_name'] as String).toList();
+      return drives;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
+  Future<void> updateDrive(String donationId, String driveName) async {
+    try {
+      await db.collection('donations').doc(donationId).update({'drive': driveName});
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // Method to delete a donation
+  Future<void> deleteDonation(BuildContext context, String donationId) async {
+    try {
+      DocumentSnapshot donationSnapshot = await db.collection('donations').doc(donationId).get();
+      if (donationSnapshot.exists) {
+        String status = donationSnapshot.get('status');
+        if (status == 'Completed') {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Cannot Delete Donation'),
+                content: const Text('This donation is already completed and cannot be deleted.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          await db.collection('donations').doc(donationId).delete();
+          notifyListeners();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop(); // Close the dialog
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Donation does not exist')),
+        );
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete donation')),
+      );
     }
   }
 }
