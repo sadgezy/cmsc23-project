@@ -13,14 +13,15 @@ class OrgDonationDetailsScreen extends StatefulWidget {
   const OrgDonationDetailsScreen({super.key, required this.donation});
 
   @override
-  State<OrgDonationDetailsScreen> createState() => _OrgDonationDetailsScreenState();
+  State<OrgDonationDetailsScreen> createState() =>
+      _OrgDonationDetailsScreenState();
 }
 
 class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
   final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
   String? code;
   String dropdownValue = 'Pending';
-  
+
   @override
   void initState() {
     super.initState();
@@ -68,7 +69,8 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                   child: const Text('Confirm'),
                   onPressed: () async {
                     if (widget.donation.id != null) {
-                      await Provider.of<MyDonationsProvider>(context, listen: false)
+                      await Provider.of<MyDonationsProvider>(context,
+                              listen: false)
                           .updateStatus(widget.donation.id!, dropdownValue);
                       Navigator.of(context).pop();
                     } else {
@@ -86,7 +88,9 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
 
   Future<void> chooseDrive(BuildContext context) async {
     // Fetch the list of donation drives from the database
-    final drives = await Provider.of<MyDonationsProvider>(context, listen: false).getDonationDrives();
+    final drives =
+        await Provider.of<MyDonationsProvider>(context, listen: false)
+            .getDonationDrives();
 
     if (drives.isEmpty) {
       return showDialog(
@@ -142,7 +146,8 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                   child: const Text('Confirm'),
                   onPressed: () async {
                     if (widget.donation.id != null) {
-                      await Provider.of<MyDonationsProvider>(context, listen: false)
+                      await Provider.of<MyDonationsProvider>(context,
+                              listen: false)
                           .updateDrive(widget.donation.id!, selectedDrive);
                       Navigator.of(context).pop();
                     } else {
@@ -185,7 +190,7 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
     );
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -206,7 +211,7 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
               ),
               Center(
                 child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.25,
+                  height: MediaQuery.of(context).size.height * 0.35,
                   child: GridView.count(
                     crossAxisCount: 2,
                     childAspectRatio: 3,
@@ -218,9 +223,10 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                           subtitle: FutureBuilder<String>(
                             future: Provider.of<OrgsProvider>(context)
                                 .getUserName(widget.donation.orgDonor),
-                            builder:
-                                (BuildContext context, AsyncSnapshot<String> snapshot) {
-                              if (snapshot.connectionState == ConnectionState.done) {
+                            builder: (BuildContext context,
+                                AsyncSnapshot<String> snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
                                 return Text(snapshot.data ?? 'No data');
                               } else if (snapshot.connectionState ==
                                   ConnectionState.none) {
@@ -272,19 +278,30 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
+                          title: const Text('Donation Drive'),
+                          subtitle: Text(widget.donation.drive.isNotEmpty
+                              ? widget.donation.drive
+                              : 'Not in a Donation Drive'),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
                           title: const Text('Status'),
                           subtitle: StreamBuilder<String>(
                             stream: code != null
-                                ? Provider.of<MyDonationsProvider>(context, listen: false)
+                                ? Provider.of<MyDonationsProvider>(context,
+                                        listen: false)
                                     .getStatusStream(code!)
                                 : Stream.value(widget.donation.status),
-                            builder:
-                                (BuildContext context, AsyncSnapshot<String> snapshot) {
+                            builder: (BuildContext context,
+                                AsyncSnapshot<String> snapshot) {
                               if (snapshot.hasError) {
                                 return Text('Error: ${snapshot.error}');
                               }
 
-                              if (snapshot.connectionState == ConnectionState.waiting) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return const CircularProgressIndicator();
                               }
 
@@ -303,7 +320,8 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                                       case 'Completed':
                                         return AppColors.statusCompleted;
                                       case 'Scheduled for Pick-up':
-                                        return AppColors.statusScheduledForPickup;
+                                        return AppColors
+                                            .statusScheduledForPickup;
                                       case 'Cancelled':
                                         return AppColors.statusCancelled;
                                       default:
@@ -339,7 +357,8 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                               Icon(Icons.update, color: Colors.white),
                               SizedBox(height: 2),
                               Text('Change Status',
-                                  style: TextStyle(color: Colors.white, fontSize: 12)),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ),
@@ -369,7 +388,9 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                             children: <Widget>[
                               Icon(Icons.qr_code, color: Colors.white),
                               SizedBox(height: 2),
-                              Text('Scan QR Code', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              Text('Scan QR Code',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ),
@@ -388,14 +409,16 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                             children: <Widget>[
                               Icon(Icons.recycling, color: Colors.white),
                               SizedBox(height: 2),
-                              Text('Choose Drive', style: TextStyle(color: Colors.white, fontSize: 12)),
-                              
+                              Text('Choose Drive',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ),
                       ),
                     ),
-                  if (widget.donation.status != 'Completed') // Check if the status is not completed
+                  if (widget.donation.status !=
+                      'Completed') // Check if the status is not completed
                     Card(
                       color: Theme.of(context).colorScheme.primaryContainer,
                       child: InkWell(
@@ -408,7 +431,9 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                             children: <Widget>[
                               Icon(Icons.delete, color: Colors.white),
                               SizedBox(height: 2),
-                              Text('Delete Donation', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              Text('Delete Donation',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ),
