@@ -37,6 +37,39 @@ class OrgsProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> getIsVerified(String orgId) async {
+    DocumentReference orgDocRef = db.collection('organizations').doc(orgId);
+    DocumentSnapshot orgDocSnapshot = await orgDocRef.get();
+
+    if (orgDocSnapshot.exists) {
+      return orgDocSnapshot['is_verified'] ?? false;
+    } else {
+      throw Exception('Organization does not exist');
+    }
+  }
+
+  Future<void> deleteOrganization(String orgId, String userId, String orgName) async {
+    try {
+      await firebaseService.deleteOrganization(orgId, userId, orgName);
+      print('Organization deleted and User org_id updated');
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> updateVerification(String docId, String userId) async {
+    try {
+      await firebaseService.updateVerification(docId, userId);
+      print('Organization verification updated');
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<void> updateOrgId(String userId, String orgId) async {
     DocumentReference userDocRef =
         FirebaseFirestore.instance.collection('users').doc(userId);
@@ -59,10 +92,8 @@ class OrgsProvider extends ChangeNotifier {
         .asyncMap(
       (snapshot) async {
         String orgId = snapshot.data()?['org_id'];
-        DocumentSnapshot orgSnapshot = await FirebaseFirestore.instance
-            .collection('organizations')
-            .doc(orgId)
-            .get();
+        DocumentSnapshot orgSnapshot =
+            await FirebaseFirestore.instance.collection('organizations').doc(orgId).get();
         return Organization.fromDocumentSnapshot(orgSnapshot);
       },
     );
@@ -81,9 +112,8 @@ class OrgsProvider extends ChangeNotifier {
         .collection('donations')
         .where('org_id', isEqualTo: orgId)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Donation.fromDocumentSnapshot(doc))
-            .toList());
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Donation.fromDocumentSnapshot(doc)).toList());
   }
 
   Future<Reference> createProofFolder(String orgName) async {
@@ -108,8 +138,7 @@ class OrgsProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> updateOrgDetails(
-      String orgId, Map<String, dynamic> newDetails) async {
+  Future<void> updateOrgDetails(String orgId, Map<String, dynamic> newDetails) async {
     await db.collection('organizations').doc(orgId).update(newDetails);
   }
 
@@ -118,8 +147,7 @@ class OrgsProvider extends ChangeNotifier {
   }
 
   Future<String> uploadLogo(File logo, String orgName) async {
-    final logoRef =
-        FirebaseOrgsAPI.storage.ref().child('org_logos/${orgName}_logo');
+    final logoRef = FirebaseOrgsAPI.storage.ref().child('org_logos/${orgName}_logo');
     final logoUploadTask = logoRef.putFile(logo);
     final logoSnapshot = await logoUploadTask;
     final logoUrl = await logoSnapshot.ref.getDownloadURL();
@@ -127,13 +155,8 @@ class OrgsProvider extends ChangeNotifier {
     return logoUrl;
   }
 
-  Future<void> submitForm(
-      GlobalKey<FormState> formKey,
-      File? logo,
-      List<File>? proofImages,
-      String orgName,
-      String orgMotto,
-      String userId) async {
+  Future<void> submitForm(GlobalKey<FormState> formKey, File? logo,
+      List<File>? proofImages, String orgName, String orgMotto, String userId) async {
     if (formKey.currentState!.validate()) {
       if (logo != null && proofImages != null && proofImages.isNotEmpty) {
         // Upload logo
@@ -157,12 +180,14 @@ class OrgsProvider extends ChangeNotifier {
     }
   }
 
+  Future<List<String>> getProofPhotos(String applicationPath) async {
+    return await FirebaseOrgsAPI().getProofPhotos(applicationPath);
+  }
+
   Future<String> getUserName(String donorId) async {
     try {
-      var userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(donorId)
-          .get();
+      var userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(donorId).get();
       return userDoc.data()?['user_name'] ?? '';
     } catch (error) {
       print('Error fetching user name: $error');

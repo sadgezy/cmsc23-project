@@ -65,7 +65,10 @@ class HomeScreen extends StatelessWidget {
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       } else {
-                        if (snapshot.data!['is_org'] == true &&
+                        if (snapshot.data != null &&
+                            snapshot.data!.containsKey('is_org') &&
+                            snapshot.data!['is_org'] == true &&
+                            snapshot.data!.containsKey('user_type') &&
                             snapshot.data!['user_type'] == 'donor') {
                           return Padding(
                             padding: const EdgeInsets.all(8.0),

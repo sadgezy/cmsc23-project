@@ -144,12 +144,71 @@ class FirebaseOrgsAPI {
     }
   }
 
+  Future<void> deleteOrganization(String orgId, String userId, String orgName) async {
+    try {
+      // Delete the organization
+      await db.collection('organizations').doc(orgId).delete();
+      print('Organization deleted');
+
+      // Update the user's org_id
+      await db.collection('users').doc(userId).update({
+        'org_id': '',
+      });
+      print('User org_id updated');
+      // Delete the proof images folder
+      var proofFolder =
+          FirebaseStorage.instance.ref().child('org_applications/$orgName proof');
+      var files = await proofFolder.listAll();
+      for (var file in files.items) {
+        await file.delete();
+      }
+      print('Proof images folder deleted');
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> updateVerification(String docId, String userId) async {
+    try {
+      await db.collection('organizations').doc(docId).update({
+        'is_verified': true,
+      });
+      print('Organization verification updated');
+      // Update the user's org_id and user_type
+      await db.collection('users').doc(userId).update({
+        'user_type': 'org',
+      });
+      print('User org_id and user_type updated');
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<Reference> createProofFolder(String orgName) async {
     try {
       return FirebaseStorage.instance
           .ref()
           .child('org_applications')
           .child('$orgName proof');
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<List<String>> getProofPhotos(String applicationPath) async {
+    try {
+      ListResult result = await FirebaseStorage.instance.ref(applicationPath).listAll();
+
+      List<String> imageUrls = [];
+      for (var ref in result.items) {
+        String url = await ref.getDownloadURL();
+        imageUrls.add(url);
+      }
+
+      return imageUrls;
     } catch (e) {
       print(e);
       rethrow;
