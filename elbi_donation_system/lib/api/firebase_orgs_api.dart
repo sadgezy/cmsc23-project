@@ -24,6 +24,15 @@ class FirebaseOrgsAPI {
     }
   }
 
+  Future<DocumentSnapshot> getOrganizationById(String orgId) async {
+    DocumentSnapshot orgSnapshot = await db.collection('organizations').doc(orgId).get();
+    if (orgSnapshot.exists) {
+      return orgSnapshot;
+    } else {
+      throw Exception('Organization not found');
+    }
+  }
+
   Future<DocumentSnapshot> getDonor(String donorId) async {
     DocumentSnapshot donorSnapshot =
         await FirebaseFirestore.instance.collection('users').doc(donorId).get();

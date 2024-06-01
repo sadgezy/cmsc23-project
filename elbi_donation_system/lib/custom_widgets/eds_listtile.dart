@@ -2,8 +2,6 @@
 
 import 'package:elbi_donation_system/textstyles.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as path;
-import 'package:flutter_svg/svg.dart';
 
 class EDSListTile extends StatelessWidget {
   final String logoUrl;
@@ -28,33 +26,24 @@ class EDSListTile extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: Colors.transparent,
-              child: path.extension(logoUrl).toLowerCase().contains('.svg')
-                  ? ClipOval(
-                      child: SvgPicture.network(
-                        logoUrl,
-                        placeholderBuilder: (BuildContext context) => Container(
-                          padding: const EdgeInsets.all(30.0),
-                          child: const CircularProgressIndicator(),
-                        ),
-                      ),
-                    )
-                  : Image.network(
-                      fit: BoxFit.cover,
-                      scale: 1.5,
-                      logoUrl,
-                      loadingBuilder: (BuildContext context, Widget child,
-                          ImageChunkEvent? loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                    ),
+              backgroundImage: NetworkImage(logoUrl),
+              // child: Image.network(
+              //   fit: BoxFit.cover,
+              //   scale: 1.5,
+              //   logoUrl,
+              //   loadingBuilder: (BuildContext context, Widget child,
+              //       ImageChunkEvent? loadingProgress) {
+              //     if (loadingProgress == null) return child;
+              //     return Center(
+              //       child: CircularProgressIndicator(
+              //         value: loadingProgress.expectedTotalBytes != null
+              //             ? loadingProgress.cumulativeBytesLoaded /
+              //                 loadingProgress.expectedTotalBytes!
+              //             : null,
+              //       ),
+              //     );
+              //   },
+              // ),
             ),
             title: Text(
               title,

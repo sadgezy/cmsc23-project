@@ -92,46 +92,44 @@ class AdminScreen extends StatelessWidget {
                   } else {
                     return SizedBox(
                       height: MediaQuery.of(context).size.height * 0.3,
-                      child: Expanded(
-                        child: ListView.builder(
-                          itemCount: snapshot.data?.docs
-                                  .where((org) => org['is_verified'] == true)
-                                  .length ??
-                              0,
-                          itemBuilder: (context, index) {
-                            var org = snapshot.data?.docs
+                      child: ListView.builder(
+                        itemCount: snapshot.data?.docs
                                 .where((org) => org['is_verified'] == true)
-                                .elementAt(index);
-                            if (org!['is_verified'] == true) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Card(
-                                  child: InkWell(
-                                    onTap: () {
-                                      // Future.delayed(
-                                      //   const Duration(milliseconds: 200),
-                                      //   () {
-                                      //     Navigator.pushNamed(
-                                      //       context,
-                                      //       '/donate',
-                                      //       arguments: org.id,
-                                      //     );
-                                      //   },
-                                      // );
-                                      print("This is Admin View");
-                                    },
-                                    child: EDSListTile(
-                                      logoUrl: org['orgLogo'],
-                                      title: org['orgName'],
-                                      subtitle: org['orgMotto'],
-                                    ),
+                                .length ??
+                            0,
+                        itemBuilder: (context, index) {
+                          var org = snapshot.data?.docs
+                              .where((org) => org['is_verified'] == true)
+                              .elementAt(index);
+                          if (org!['is_verified'] == true) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Card(
+                                child: InkWell(
+                                  onTap: () {
+                                    // Future.delayed(
+                                    //   const Duration(milliseconds: 200),
+                                    //   () {
+                                    //     Navigator.pushNamed(
+                                    //       context,
+                                    //       '/donate',
+                                    //       arguments: org.id,
+                                    //     );
+                                    //   },
+                                    // );
+                                    print("This is Admin View");
+                                  },
+                                  child: EDSListTile(
+                                    logoUrl: org['orgLogo'],
+                                    title: org['orgName'],
+                                    subtitle: org['orgMotto'],
                                   ),
                                 ),
-                              );
-                            }
-                            return null;
-                          },
-                        ),
+                              ),
+                            );
+                          }
+                          return null;
+                        },
                       ),
                     );
                   }
@@ -159,85 +157,84 @@ class AdminScreen extends StatelessWidget {
                   var docs =
                       snapshot.data?.docs.where((doc) => doc['org_id'] != "").toList() ??
                           [];
-                  var approvedDocs =
-                      snapshot.data?.docs.where((doc) => doc['org_id'] == "").toList() ??
-                          [];
 
-                  return approvedDocs.isNotEmpty
-                      ? const Center(
-                          child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Great! No pending organization applications.',
-                                style: TextStyle(fontSize: 16),
-                              )))
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: docs.length,
-                          itemBuilder: (context, index) {
-                            var org = docs[index];
-                            return FutureBuilder<bool>(
-                              future: Provider.of<OrgsProvider>(context)
-                                  .getIsVerified(org['org_id']),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  // Check if is_verified is false
-                                  if (snapshot.data == false) {
-                                    return InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                OrganizationDetailScreen(
-                                              orgId: org['org_id'],
-                                              regId: org.id,
-                                              regName: org['name'],
-                                              orgEmail: org['email'],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: ListTile(
-                                        title: Text(org['name']),
-                                        subtitle: Text(org['email']),
-                                        // trailing: Row(
-                                        //   mainAxisSize: MainAxisSize.min,
-                                        //   children: [
-                                        //     IconButton(
-                                        //       icon: const Icon(Icons.check),
-                                        //       onPressed: () async {
-                                        //         Provider.of<OrgsProvider>(context,
-                                        //             listen: false);
-                                        //         // .approveOrganization(org?.id);
-                                        //       },
-                                        //     ),
-                                        //     IconButton(
-                                        //       icon: const Icon(Icons.close),
-                                        //       onPressed: () async {
-                                        //         Provider.of<OrgsProvider>(context,
-                                        //             listen: false);
-                                        //         // .rejectOrganization(org?.id);
-                                        //       },
-                                        //     ),
-                                        //   ],
-                                        // ),
-                                        trailing: const Icon(Icons.arrow_forward_ios),
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      var org = docs[index];
+                      return FutureBuilder<bool>(
+                        future: org['org_id'] != null
+                            ? Provider.of<OrgsProvider>(context)
+                                .getIsVerified(org['org_id'])
+                            : Future.value(false),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            if (snapshot.data == true) {
+                              if (index == docs.length - 1) {
+                                return const Center(
+                                    child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Great! No pending organization applications.',
+                                          style: TextStyle(fontSize: 16),
+                                        )));
+                              } else {
+                                return Container(); // return an empty container for verified items
+                              }
+                            } else {
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OrganizationDetailScreen(
+                                        orgId: org['org_id'],
+                                        regId: org.id,
+                                        regName: org['name'],
+                                        orgEmail: org['email'],
                                       ),
-                                    );
-                                  } else {
-                                    return Container(); // Return an empty container if is_verified is not false
-                                  }
-                                }
-                              },
-                            );
-                          },
-                        );
+                                    ),
+                                  );
+                                },
+                                child: ListTile(
+                                  title: Text(org['name']),
+                                  subtitle: Text(org['email']),
+                                  // trailing: Row(
+                                  //   mainAxisSize: MainAxisSize.min,
+                                  //   children: [
+                                  //     IconButton(
+                                  //       icon: const Icon(Icons.check),
+                                  //       onPressed: () async {
+                                  //         Provider.of<OrgsProvider>(context,
+                                  //             listen: false);
+                                  //         // .approveOrganization(org?.id);
+                                  //       },
+                                  //     ),
+                                  //     IconButton(
+                                  //       icon: const Icon(Icons.close),
+                                  //       onPressed: () async {
+                                  //         Provider.of<OrgsProvider>(context,
+                                  //             listen: false);
+                                  //         // .rejectOrganization(org?.id);
+                                  //       },
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  trailing: const Icon(Icons.arrow_forward_ios),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      );
+                    },
+                  );
                 }
               },
             ),

@@ -38,13 +38,12 @@ class OrgsProvider extends ChangeNotifier {
   }
 
   Future<bool> getIsVerified(String orgId) async {
-    DocumentReference orgDocRef = db.collection('organizations').doc(orgId);
-    DocumentSnapshot orgDocSnapshot = await orgDocRef.get();
-
-    if (orgDocSnapshot.exists) {
+    try {
+      DocumentSnapshot orgDocSnapshot = await firebaseService.getOrganizationById(orgId);
       return orgDocSnapshot['is_verified'] ?? false;
-    } else {
-      throw Exception('Organization does not exist');
+    } catch (e) {
+      print('Caught an exception: $e');
+      return false; // return false or handle the exception as needed
     }
   }
 
