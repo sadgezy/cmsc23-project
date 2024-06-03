@@ -30,14 +30,17 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+          Map<String, dynamic> data =
+              snapshot.data!.data() as Map<String, dynamic>;
           List<String> trueCategories = [];
           Map<String, dynamic> itemCategory = data['item_category'];
-          itemCategory.forEach((key, value) {
-            if (value == true) {
-              trueCategories.add(key);
-            }
-          });
+          itemCategory.forEach(
+            (key, value) {
+              if (value == true) {
+                trueCategories.add(key);
+              }
+            },
+          );
           return Scaffold(
             appBar: AppBar(
               title: const Text('Donation Details'),
@@ -45,18 +48,19 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
             body: ListView(
               children: <Widget>[
                 ListTile(
-                    subtitle: SizedBox(
-                  height: 150,
-                  width: 300,
-                  child: ClipRRect(
-                    clipBehavior: Clip.hardEdge,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      data['image'],
-                      width: 100,
+                  subtitle: SizedBox(
+                    height: 150,
+                    width: 300,
+                    child: ClipRRect(
+                      clipBehavior: Clip.hardEdge,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        data['image'],
+                        width: 100,
+                      ),
                     ),
                   ),
-                )),
+                ),
                 ListTile(
                   title: const Text('Item Category'),
                   subtitle: Text(trueCategories.join(', ')),
@@ -81,8 +85,9 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
                 ListTile(
                   title: const Text('Organization Name'),
                   subtitle: FutureBuilder<String>(
-                    future: Provider.of<MyDonationsProvider>(context, listen: false)
-                        .getOrgNameFromId(data['org_id']),
+                    future:
+                        Provider.of<MyDonationsProvider>(context, listen: false)
+                            .getOrgNameFromId(data['org_id']),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Container();
@@ -95,14 +100,20 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
                   ),
                 ),
                 ListTile(
+                  title: const Text('Donation Drive'),
+                  subtitle: Text(data['drive'] ?? 'Not in a Drive'),
+                ),
+                ListTile(
                   title: const Text('Status'),
                   subtitle: Text(data['status']),
                 ),
                 ListTile(
                   title: const Text('Selected Address'),
-                  subtitle: Text(data['selected_address'].toString().toUpperCase()),
+                  subtitle:
+                      Text(data['selected_address'].toString().toUpperCase()),
                 ),
-                data['status'] != 'Cancelled' && data['delivery_method'] == 'Drop-off'
+                data['status'] != 'Cancelled' &&
+                        data['delivery_method'] == 'Drop-off'
                     ? Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
@@ -126,14 +137,15 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.grey[300],
                                                   borderRadius:
-                                                      BorderRadius.circular(2.0),
+                                                      BorderRadius.circular(
+                                                          2.0),
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(height: 10),
                                             const Padding(
-                                              padding:
-                                                  EdgeInsets.symmetric(vertical: 8.0),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 8.0),
                                               child: Text(
                                                 'Show this QR code to the organization to confirm your donation.',
                                                 style: TextStyle(fontSize: 16),
@@ -143,16 +155,21 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
                                             const SizedBox(height: 10),
                                             Container(
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                                 color: Colors.white,
                                               ),
-                                              height: MediaQuery.of(context).size.height *
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
                                                   0.3,
                                               child: Center(
                                                 child: Screenshot(
-                                                  controller: screenshotController,
+                                                  controller:
+                                                      screenshotController,
                                                   child: QrImageView(
-                                                    data: widget.documentId.toString(),
+                                                    data: widget.documentId
+                                                        .toString(),
                                                   ),
                                                 ),
                                               ),
@@ -160,7 +177,8 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
                                             const SizedBox(height: 10),
                                             FilledButton(
                                               onPressed: () {
-                                                Provider.of<MyDonationsProvider>(context,
+                                                Provider.of<MyDonationsProvider>(
+                                                        context,
                                                         listen: false)
                                                     .captureAndSaveQRCode(
                                                         screenshotController);
@@ -192,20 +210,23 @@ class _DonationDetailsScreenState extends State<DonationDetailsScreen> {
                           ],
                         ),
                       )
-                    : data['status'] != 'Cancelled' && data['delivery_method'] == 'Pickup'
+                    : data['status'] != 'Cancelled' &&
+                            data['delivery_method'] == 'Pickup'
                         ? Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.4,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
                                   child: ElevatedButton(
                                     onPressed: () {
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
-                                          return CancelDialog(document: snapshot.data!);
+                                          return CancelDialog(
+                                              document: snapshot.data!);
                                         },
                                       );
                                     },

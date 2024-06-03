@@ -390,16 +390,17 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                       child: InkWell(
                         onTap: () {
                           _qrBarCodeScannerDialogPlugin.getScannedQrBarCode(
-                              context: context,
-                              onCode: (code) async {
-                                setState(() {
-                                  this.code = code;
-                                });
-                                print(code);
-                                await Provider.of<MyDonationsProvider>(context,
-                                        listen: false)
-                                    .confirmStatus(context, code!);
+                            context: context,
+                            onCode: (code) async {
+                              setState(() {
+                                this.code = code;
                               });
+                              print(code);
+                              await Provider.of<MyDonationsProvider>(context,
+                                      listen: false)
+                                  .confirmStatus(context, code!);
+                            },
+                          );
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
