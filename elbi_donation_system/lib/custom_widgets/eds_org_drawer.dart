@@ -1,6 +1,7 @@
 import 'package:elbi_donation_system/models/organization_model.dart';
 import 'package:elbi_donation_system/providers/auth_provider.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
+import 'package:elbi_donation_system/screens/donation_drives_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +35,7 @@ class OrgDrawer extends StatelessWidget {
               }
 
               Organization org = snapshot.data!;
+              print('Test ${org.name}');
               return Column(
                 children: [
                   UserAccountsDrawerHeader(
@@ -59,18 +61,39 @@ class OrgDrawer extends StatelessWidget {
                         return Text('Error: ${snapshot.error}');
                       }
 
-                      return FilledButton(
-                          onPressed: () {
-                            if (ModalRoute.of(context)?.settings.name !=
-                                "/edit_org_profile") {
+                      return Column(
+                        children: [
+                          FilledButton(
+                            onPressed: () {
+                              if (ModalRoute.of(context)?.settings.name !=
+                                  "/edit_org_profile") {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(
+                                    context, "/edit_org_profile",
+                                    arguments: snapshot.data);
+                              } else {
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: const Text('Edit Org Profile'),
+                          ),
+                          ListTile(
+                            title: const Text('Donation Drives'),
+                            onTap: () {
                               Navigator.pop(context);
-                              Navigator.pushNamed(context, "/edit_org_profile",
-                                  arguments: snapshot.data);
-                            } else {
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: const Text('Edit Org Profile'));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    print(' XD ${org.name}');
+                                    return DonationDrivesScreen(org: org);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      );
                     },
                   ),
                 ],

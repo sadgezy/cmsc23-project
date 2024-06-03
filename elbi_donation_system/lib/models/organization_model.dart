@@ -6,16 +6,16 @@ class Organization {
   final String logoUrl;
   final bool isVerified;
   final String proofImages;
-  Map<String, String>? drives;
+  List<String>? drives; // Changed from Map to List
 
-  Organization(
-      {required this.name,
-      required this.motto,
-      required this.logoUrl,
-      required this.isVerified,
-      required this.proofImages,
-      Map<String, String>? drives})
-      : drives = drives ?? {};
+  Organization({
+    required this.name,
+    required this.motto,
+    required this.logoUrl,
+    required this.isVerified,
+    required this.proofImages,
+    required this.drives,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -35,7 +35,7 @@ class Organization {
       logoUrl: doc['orgLogo'],
       isVerified: doc['is_verified'],
       proofImages: doc['proofimages'],
-      drives: Map<String, String>.from(doc['donation_drives']),
+      drives: List<String>.from(doc['donation_drives'] ?? []),
     );
   }
 }

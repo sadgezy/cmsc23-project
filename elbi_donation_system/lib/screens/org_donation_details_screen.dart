@@ -1,5 +1,6 @@
 import 'package:elbi_donation_system/appcolors.dart';
 import 'package:elbi_donation_system/models/donation_model.dart';
+import 'package:elbi_donation_system/models/organization_model.dart';
 import 'package:elbi_donation_system/providers/donations_provider.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,10 @@ import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
 
 class OrgDonationDetailsScreen extends StatefulWidget {
   final Donation donation;
+  final Organization org;
 
-  const OrgDonationDetailsScreen({super.key, required this.donation});
+  const OrgDonationDetailsScreen(
+      {super.key, required this.donation, required this.org});
 
   @override
   State<OrgDonationDetailsScreen> createState() =>
@@ -86,13 +89,12 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
     );
   }
 
-  Future<void> chooseDrive(BuildContext context, String currentDrive) async {
-    // Fetch the list of donation drives from the database
-    final drives =
-        await Provider.of<MyDonationsProvider>(context, listen: false)
-            .getDonationDrives();
+  Future<void> chooseDrive(
+      BuildContext context, String currentDrive, Organization org) async {
+    // Ensure the list of donation drives is unique
+    final drives = org.drives?.toSet().toList();
 
-    if (drives.isEmpty) {
+    if (drives!.isEmpty) {
       return showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -112,8 +114,10 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
       );
     }
 
-    String selectedDrive =
-        currentDrive.isNotEmpty ? currentDrive : drives.first;
+    String? selectedDrive =
+        currentDrive.isNotEmpty && drives.contains(currentDrive)
+            ? currentDrive
+            : drives.first;
 
     showDialog(
       context: context,
@@ -149,7 +153,7 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                     if (widget.donation.id != null) {
                       await Provider.of<MyDonationsProvider>(context,
                               listen: false)
-                          .updateDrive(widget.donation.id!, selectedDrive);
+                          .updateDrive(widget.donation.id!, selectedDrive!);
                       Navigator.of(context).pop();
                     } else {
                       print('Donation ID is null');
@@ -416,7 +420,8 @@ class _OrgDonationDetailsScreenState extends State<OrgDonationDetailsScreen> {
                       color: Theme.of(context).colorScheme.primaryContainer,
                       child: InkWell(
                         onTap: () {
-                          chooseDrive(context, widget.donation.drive);
+                          chooseDrive(context, widget.donation.drive,
+                              widget.org); // Pass org here
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),

@@ -5,7 +5,8 @@ class DonationSuccessScreen extends StatelessWidget {
   final String orgName;
   final String donorID;
 
-  const DonationSuccessScreen({super.key, required this.orgName, required this.donorID});
+  const DonationSuccessScreen(
+      {super.key, required this.orgName, required this.donorID});
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +43,14 @@ class DonationSuccessScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const HomeScreen(),
+                //   ),
+                // );
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
               child: Text(
                 'Go back to Homepage',

@@ -114,7 +114,9 @@ class OrganizationHomepage extends StatelessWidget {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       OrgDonationDetailsScreen(
-                                                          donation: donation),
+                                                    donation: donation,
+                                                    org: org,
+                                                  ),
                                                 ),
                                               );
                                             },
@@ -162,7 +164,9 @@ class OrganizationHomepage extends StatelessWidget {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       OrgDonationDetailsScreen(
-                                                          donation: donation),
+                                                    donation: donation,
+                                                    org: org,
+                                                  ),
                                                 ),
                                               );
                                             },
