@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elbi_donation_system/custom_widgets/eds_drawer.dart';
 import 'package:elbi_donation_system/custom_widgets/eds_listtile.dart';
 import 'package:elbi_donation_system/providers/orgs_provider.dart';
+import 'package:elbi_donation_system/screens/org_rejected_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -63,13 +64,24 @@ class HomeScreen extends StatelessWidget {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
+                        return Text('Error here: ${snapshot.error}');
+                      }
+                      if (snapshot.data != null &&
+                          snapshot.data!.containsKey('is_org') &&
+                          snapshot.data!['is_org'] == true &&
+                          snapshot.data!.containsKey('user_type') &&
+                          snapshot.data!['user_type'] == 'donor') {
                         if (snapshot.data != null &&
-                            snapshot.data!.containsKey('is_org') &&
-                            snapshot.data!['is_org'] == true &&
-                            snapshot.data!.containsKey('user_type') &&
-                            snapshot.data!['user_type'] == 'donor') {
+                            snapshot.data!.containsKey('org_id') &&
+                            snapshot.data!['org_id'] == 'rejected') {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => const OrgRejectedScreen(),
+                              ),
+                            );
+                          });
+                        } else {
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Card(
@@ -86,10 +98,9 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           );
-                        } else {
-                          return Container();
                         }
                       }
+                      return Container();
                     },
                   ),
                   Expanded(

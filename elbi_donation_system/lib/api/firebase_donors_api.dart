@@ -5,7 +5,7 @@ class FirebaseDonorsAPI {
 
   Future<String> deleteDonor(String? id) async {
     try {
-      await db.collection("donor_view").doc(id).delete();
+      await db.collection("users").doc(id).delete();
       return "Successfully deleted!";
     } on FirebaseException catch (e) {
       return "Error in ${e.code}: ${e.message}";

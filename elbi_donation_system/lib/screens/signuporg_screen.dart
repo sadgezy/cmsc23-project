@@ -177,24 +177,26 @@ class SignUpOrgScreenState extends State<SignUpOrgScreen> {
                       ),
                       const SizedBox(height: 24),
                       FilledButton(
-                        onPressed: () async {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          await Provider.of<OrgsProvider>(context, listen: false)
-                              .submitForm(
-                            _formKey,
-                            _logo,
-                            _images,
-                            _orgNameController.text,
-                            _orgMottoController.text,
-                            widget.userId!,
-                          );
-                          setState(() {
-                            _isLoading = false;
-                          });
-                          Navigator.pop(context);
-                        },
+                        onPressed: (_images != null && _images!.isNotEmpty)
+                            ? () async {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                await Provider.of<OrgsProvider>(context, listen: false)
+                                    .submitForm(
+                                  _formKey,
+                                  _logo,
+                                  _images,
+                                  _orgNameController.text,
+                                  _orgMottoController.text,
+                                  widget.userId!,
+                                );
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                Navigator.pop(context);
+                              }
+                            : null,
                         child: const Text('Submit'),
                       ),
                     ],

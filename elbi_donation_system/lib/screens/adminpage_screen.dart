@@ -154,9 +154,11 @@ class AdminScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return const Center(child: Text('Error'));
                 } else {
-                  var docs =
-                      snapshot.data?.docs.where((doc) => doc['org_id'] != "").toList() ??
-                          [];
+                  var docs = snapshot.data?.docs
+                          .where(
+                              (doc) => doc['org_id'] != "" && doc['org_id'] != "rejected")
+                          .toList() ??
+                      [];
 
                   return ListView.builder(
                     shrinkWrap: true,
@@ -175,19 +177,7 @@ class AdminScreen extends StatelessWidget {
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else {
-                            if (snapshot.data == true) {
-                              if (index == docs.length - 1) {
-                                return const Center(
-                                    child: Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Great! No pending organization applications.',
-                                          style: TextStyle(fontSize: 16),
-                                        )));
-                              } else {
-                                return Container(); // return an empty container for verified items
-                              }
-                            } else {
+                            if (snapshot.data == false) {
                               return InkWell(
                                 onTap: () {
                                   Navigator.push(
@@ -231,6 +221,7 @@ class AdminScreen extends StatelessWidget {
                               );
                             }
                           }
+                          return Container();
                         },
                       );
                     },
