@@ -91,9 +91,14 @@ class MyDonationsProvider with ChangeNotifier {
 
   Future<List<String>> getDonationDrives() async {
     try {
-      QuerySnapshot snapshot = await db.collection('donation-drives').get();
-      List<String> drives =
-          snapshot.docs.map((doc) => doc['drive_name'] as String).toList();
+      QuerySnapshot snapshot = await db.collection('organizations').get();
+      print('the org ${snapshot.docs.first}');
+      List<String> drives = snapshot.docs
+          .map((doc) => List<String>.from(doc['donation_drives'] ?? []))
+          .expand((drivesList) => drivesList)
+          .toList();
+
+      print('the drives ${drives}');
       return drives;
     } catch (e) {
       print(e);
@@ -167,6 +172,106 @@ class MyDonationsProvider with ChangeNotifier {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to delete donation')),
       );
+    }
+  }
+
+  // DONATION DRIVES PART
+
+  Future<void> addDonationDrive(String orgName, String driveName) async {
+    try {
+      // Query the organization collection to find the document with the matching orgName
+      QuerySnapshot querySnapshot = await db
+          .collection('organizations')
+          .where('orgName', isEqualTo: orgName)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print('No organization found with orgName: $orgName');
+        return;
+      }
+
+      DocumentReference orgRef = querySnapshot.docs.first.reference;
+
+      await orgRef.update({
+        'donation_drives': FieldValue.arrayUnion([driveName]),
+      });
+
+      print('Donation drive added successfully.');
+    } catch (e) {
+      print('Error adding donation drive: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<String>> getOrgDonationDrives(String orgId) async {
+    DocumentReference orgRef =
+        FirebaseFirestore.instance.collection('organizations').doc(orgId);
+
+    try {
+      DocumentSnapshot snapshot = await orgRef.get();
+      List<String> drives = List<String>.from(snapshot['donation_drives']);
+      return drives;
+    } catch (e) {
+      print(e);
+      throw Exception('Failed to load donation drives');
+    }
+  }
+
+  Future<void> updateDonationDrive(
+      String orgName, String oldDriveName, String newDriveName) async {
+    try {
+      QuerySnapshot querySnapshot = await db
+          .collection('organizations')
+          .where('orgName', isEqualTo: orgName)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print('No organization found with orgName: $orgName');
+        return;
+      }
+
+      DocumentReference orgRef = querySnapshot.docs.first.reference;
+
+      // Remove the old drive name and add the new drive name
+      await orgRef.update({
+        'donation_drives': FieldValue.arrayRemove([oldDriveName]),
+      });
+
+      await orgRef.update({
+        'donation_drives': FieldValue.arrayUnion([newDriveName]),
+      });
+
+      print('Donation drive edited successfully.');
+    } catch (e) {
+      print('Error editing donation drive: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteDonationDriveByName(
+      String orgName, String driveName) async {
+    try {
+      QuerySnapshot querySnapshot = await db
+          .collection('organizations')
+          .where('orgName', isEqualTo: orgName)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print('No organization found with orgName: $orgName');
+        return;
+      }
+
+      DocumentReference orgRef = querySnapshot.docs.first.reference;
+      // print('Org Name: $orgName');
+      // print('Drive Name: $driveName');
+      await orgRef.update({
+        'donation_drives': FieldValue.arrayRemove([driveName]),
+      });
+
+      print('Donation drive deleted successfully.');
+    } catch (e) {
+      print('Bat di nagana: $e');
+      rethrow;
     }
   }
 }
