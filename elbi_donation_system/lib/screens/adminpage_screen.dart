@@ -158,9 +158,8 @@ class AdminScreen extends StatelessWidget {
                   return const Center(child: Text('Error'));
                 } else {
                   var docs = snapshot.data?.docs
-                          .where((doc) =>
-                              doc['org_id'] != "" &&
-                              doc['org_id'] != "rejected")
+                          .where(
+                              (doc) => doc['org_id'] != "" && doc['org_id'] != "rejected")
                           .toList() ??
                       [];
 

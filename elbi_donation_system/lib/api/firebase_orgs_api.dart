@@ -14,10 +14,8 @@ class FirebaseOrgsAPI {
   }
 
   Future<String> getOrganizationId(String orgName) async {
-    final querySnapshot = await db
-        .collection("organizations")
-        .where("orgName", isEqualTo: orgName)
-        .get();
+    final querySnapshot =
+        await db.collection("organizations").where("orgName", isEqualTo: orgName).get();
 
     if (querySnapshot.docs.isNotEmpty) {
       return querySnapshot.docs.first.id;
@@ -27,8 +25,7 @@ class FirebaseOrgsAPI {
   }
 
   Future<DocumentSnapshot> getOrganizationById(String orgId) async {
-    DocumentSnapshot orgSnapshot =
-        await db.collection('organizations').doc(orgId).get();
+    DocumentSnapshot orgSnapshot = await db.collection('organizations').doc(orgId).get();
     if (orgSnapshot.exists) {
       return orgSnapshot;
     } else {
@@ -47,10 +44,8 @@ class FirebaseOrgsAPI {
   }
 
   Future<String> getOrgName(String orgId) async {
-    DocumentSnapshot orgSnapshot = await FirebaseFirestore.instance
-        .collection('organizations')
-        .doc(orgId)
-        .get();
+    DocumentSnapshot orgSnapshot =
+        await FirebaseFirestore.instance.collection('organizations').doc(orgId).get();
     if (orgSnapshot.exists) {
       var data = orgSnapshot.data() as Map<String, dynamic>?;
       if (data != null) {
@@ -109,8 +104,7 @@ class FirebaseOrgsAPI {
     }
   }
 
-  Future<List<String>> uploadProofPhotos(
-      String orgName, List<File> images) async {
+  Future<List<String>> uploadProofPhotos(String orgName, List<File> images) async {
     List<String> downloadUrls = [];
 
     for (var image in images) {
@@ -130,16 +124,14 @@ class FirebaseOrgsAPI {
 
   Future<String> uploadOrgLogo(File photo) async {
     try {
-      Reference storageReference = FirebaseStorage.instance
-          .ref()
-          .child('org_logos/${path.basename(photo.path)}');
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child('org_logos/${path.basename(photo.path)}');
 
       UploadTask uploadTask = storageReference.putFile(photo);
       await uploadTask.whenComplete(() => null);
 
       // Get the gs path
-      String gsPath =
-          'gs://${storageReference.bucket}/${storageReference.fullPath}';
+      String gsPath = 'gs://${storageReference.bucket}/${storageReference.fullPath}';
 
       print('Photo uploaded');
       return gsPath;
@@ -161,8 +153,7 @@ class FirebaseOrgsAPI {
     }
   }
 
-  Future<void> deleteOrganization(
-      String orgId, String userId, String orgName) async {
+  Future<void> deleteOrganization(String orgId, String userId, String orgName) async {
     try {
       // Delete the organization
       await db.collection('organizations').doc(orgId).delete();
@@ -170,13 +161,12 @@ class FirebaseOrgsAPI {
 
       // Update the user's org_id
       await db.collection('users').doc(userId).update({
-        'org_id': '',
+        'org_id': 'rejected',
       });
       print('User org_id updated');
       // Delete the proof images folder
-      var proofFolder = FirebaseStorage.instance
-          .ref()
-          .child('org_applications/$orgName proof');
+      var proofFolder =
+          FirebaseStorage.instance.ref().child('org_applications/$orgName proof');
       var files = await proofFolder.listAll();
       for (var file in files.items) {
         await file.delete();
@@ -219,8 +209,7 @@ class FirebaseOrgsAPI {
 
   Future<List<String>> getProofPhotos(String applicationPath) async {
     try {
-      ListResult result =
-          await FirebaseStorage.instance.ref(applicationPath).listAll();
+      ListResult result = await FirebaseStorage.instance.ref(applicationPath).listAll();
 
       List<String> imageUrls = [];
       for (var ref in result.items) {
