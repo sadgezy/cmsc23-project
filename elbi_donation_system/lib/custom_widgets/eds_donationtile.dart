@@ -7,13 +7,14 @@ class EDSDonationTile extends StatelessWidget {
   final String image;
   final String status;
   final String orgDonor;
+  final String orgName;
 
-  const EDSDonationTile({
-    super.key,
-    required this.image,
-    required this.status,
-    required this.orgDonor,
-  });
+  const EDSDonationTile(
+      {super.key,
+      required this.image,
+      required this.status,
+      required this.orgDonor,
+      required this.orgName});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,6 @@ class EDSDonationTile extends StatelessWidget {
             ),
             subtitle: Text(
               orgDonor,
-              style: AppTextStyles.subtitle,
             ),
             trailing: const Icon(Icons.delete),
           ),

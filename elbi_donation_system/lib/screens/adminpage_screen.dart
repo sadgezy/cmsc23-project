@@ -158,8 +158,9 @@ class AdminScreen extends StatelessWidget {
                   return const Center(child: Text('Error'));
                 } else {
                   var docs = snapshot.data?.docs
-                          .where(
-                              (doc) => doc['org_id'] != "" && doc['org_id'] != "rejected")
+                          .where((doc) =>
+                              doc['org_id'] != "" &&
+                              doc['org_id'] != "rejected")
                           .toList() ??
                       [];
 
@@ -313,16 +314,52 @@ class AdminScreen extends StatelessWidget {
                             return const Center(child: Text('Error'));
                           } else if (!userSnapshot.hasData ||
                               !userSnapshot.data!.exists) {
-                            return Center(
-                              child: EDSDonationTile(
-                                image: donation?['image'],
-                                status: donation?['status'],
-                                orgDonor: 'Donor not Found',
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Card(
+                                child: InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text("Confirm Deletion"),
+                                          content: const Text(
+                                              "Are you sure you want to delete this donation?"),
+                                          actions: [
+                                            TextButton(
+                                              child: const Text("Cancel"),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: const Text("Delete"),
+                                              onPressed: () async {
+                                                await FirebaseFirestore.instance
+                                                    .collection('donations')
+                                                    .doc(donation?.id)
+                                                    .delete();
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: EDSDonationTile(
+                                    image: donation?['image'],
+                                    status: donation?['status'],
+                                    orgDonor: 'Unidentified Org Donor',
+                                    orgName: donation?['org_id'],
+                                  ),
+                                ),
                               ),
                             );
                           } else {
                             var orgDonorName = userSnapshot.data?['name'];
-
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),
@@ -362,6 +399,7 @@ class AdminScreen extends StatelessWidget {
                                     image: donation?['image'],
                                     status: donation?['status'],
                                     orgDonor: orgDonorName,
+                                    orgName: donation?['org_id'],
                                   ),
                                 ),
                               ),
