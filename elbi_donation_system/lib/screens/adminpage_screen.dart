@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/custom_widgets/eds_donationtile.dart';
 import 'package:elbi_donation_system/screens/org_details_admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,8 +52,9 @@ class AdminScreen extends StatelessWidget {
               onTap: () => Scaffold.of(context).openDrawer(),
               child: Builder(
                 builder: (context) {
-                  final initials = Provider.of<UserAuthProvider>(context, listen: false)
-                      .getUserInitials();
+                  final initials =
+                      Provider.of<UserAuthProvider>(context, listen: false)
+                          .getUserInitials();
                   return InkWell(
                     onTap: () => Scaffold.of(context).openDrawer(),
                     child: CircleAvatar(
@@ -77,8 +79,8 @@ class AdminScreen extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child:
-                  Text("Organizations", style: Theme.of(context).textTheme.headlineLarge),
+              child: Text("Organizations",
+                  style: Theme.of(context).textTheme.headlineLarge),
             ),
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.5,
@@ -103,7 +105,8 @@ class AdminScreen extends StatelessWidget {
                               .elementAt(index);
                           if (org!['is_verified'] == true) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Card(
                                 child: InkWell(
                                   onTap: () {
@@ -154,9 +157,12 @@ class AdminScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return const Center(child: Text('Error'));
                 } else {
-                  var docs =
-                      snapshot.data?.docs.where((doc) => doc['org_id'] != "").toList() ??
-                          [];
+                  var docs = snapshot.data?.docs
+                          .where((doc) =>
+                              doc['org_id'] != "" &&
+                              doc['org_id'] != "rejected")
+                          .toList() ??
+                      [];
 
                   return ListView.builder(
                     shrinkWrap: true,
@@ -170,30 +176,20 @@ class AdminScreen extends StatelessWidget {
                                 .getIsVerified(org['org_id'])
                             : Future.value(false),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return Text('Error: ${snapshot.error}');
                           } else {
-                            if (snapshot.data == true) {
-                              if (index == docs.length - 1) {
-                                return const Center(
-                                    child: Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Great! No pending organization applications.',
-                                          style: TextStyle(fontSize: 16),
-                                        )));
-                              } else {
-                                return Container(); // return an empty container for verified items
-                              }
-                            } else {
+                            if (snapshot.data == false) {
                               return InkWell(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => OrganizationDetailScreen(
+                                      builder: (context) =>
+                                          OrganizationDetailScreen(
                                         orgId: org['org_id'],
                                         regId: org.id,
                                         regName: org['name'],
@@ -231,6 +227,7 @@ class AdminScreen extends StatelessWidget {
                               );
                             }
                           }
+                          return Container();
                         },
                       );
                     },
@@ -242,7 +239,8 @@ class AdminScreen extends StatelessWidget {
             const Divider(height: 16.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Donors", style: Theme.of(context).textTheme.headlineLarge),
+              child: Text("Donors",
+                  style: Theme.of(context).textTheme.headlineLarge),
             ),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -271,6 +269,106 @@ class AdminScreen extends StatelessWidget {
                             firebaseDonorsAPI.deleteDonor(donor?.id);
                           },
                         ),
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 16.0),
+            const Divider(height: 16.0),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Donations",
+                  style: Theme.of(context).textTheme.headlineLarge),
+            ),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('donations')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Error'));
+                } else {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: snapshot.data?.docs.length ?? 0,
+                    itemBuilder: (context, index) {
+                      var donation = snapshot.data?.docs[index];
+                      var orgDonorId = donation?['org_donor'];
+
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(orgDonorId)
+                            .get(),
+                        builder: (context, userSnapshot) {
+                          if (userSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (userSnapshot.hasError) {
+                            return const Center(child: Text('Error'));
+                          } else if (!userSnapshot.hasData ||
+                              !userSnapshot.data!.exists) {
+                            return Center(
+                              child: EDSDonationTile(
+                                image: donation?['image'],
+                                status: donation?['status'],
+                                orgDonor: 'Donor not Found',
+                              ),
+                            );
+                          } else {
+                            var orgDonorName = userSnapshot.data?['name'];
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Card(
+                                child: InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text("Confirm Deletion"),
+                                          content: const Text(
+                                              "Are you sure you want to delete this donation?"),
+                                          actions: [
+                                            TextButton(
+                                              child: const Text("Cancel"),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: const Text("Delete"),
+                                              onPressed: () async {
+                                                await FirebaseFirestore.instance
+                                                    .collection('donations')
+                                                    .doc(donation?.id)
+                                                    .delete();
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: EDSDonationTile(
+                                    image: donation?['image'],
+                                    status: donation?['status'],
+                                    orgDonor: orgDonorName,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       );
                     },
                   );
