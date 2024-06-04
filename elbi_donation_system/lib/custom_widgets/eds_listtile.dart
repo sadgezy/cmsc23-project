@@ -53,7 +53,7 @@ class EDSListTile extends StatelessWidget {
               subtitle,
               style: AppTextStyles.subtitle,
             ),
-            trailing: const Icon(Icons.arrow_forward_ios),
+            // trailing: const Icon(Icons.delete),
           ),
         ),
       ),
