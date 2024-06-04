@@ -1,13 +1,27 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elbi_donation_system/api/firebase_donors_api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 
 class MyDonationsProvider with ChangeNotifier {
+  FirebaseDonorsAPI firebaseService = FirebaseDonorsAPI();
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  late Stream<QuerySnapshot> _donationsStream;
+
+  MyDonationsProvider() {
+    fetchDonations();
+  }
+
+  Stream<QuerySnapshot> get donations => _donationsStream;
+
+  void fetchDonations() async {
+    _donationsStream = firebaseService.getDonations();
+    // notifyListeners();
+  }
 
   Stream<QuerySnapshot> getUserDonations(String userId) {
     return db

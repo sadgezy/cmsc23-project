@@ -3,6 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseDonorsAPI {
   static final FirebaseFirestore db = FirebaseFirestore.instance;
 
+  Stream<QuerySnapshot> getDonations() {
+    return db.collection("donations").snapshots();
+  }
+
   Future<String> deleteDonor(String? id) async {
     try {
       await db.collection("users").doc(id).delete();
